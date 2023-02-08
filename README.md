@@ -31,6 +31,7 @@ _✨maimaiDX，nonebot2插件版本✨_
 ## 前置步骤（和原项目一样）
 
 安装:
+
     pip3 install nonebot_plugin_maimai
     nb plugin install nonebot_plugin_maimai
     # git clone 那我建议你还是用原作者的罢
