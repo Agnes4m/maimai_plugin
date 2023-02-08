@@ -1,12 +1,12 @@
 # Author: xyb, Diving_Fish
-import asyncio
+
 import os
 import math
-from typing import Optional, Dict, List
-
+from typing import Optional, Dict, List,Tuple
+from .tool import STATIC
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import get_cover_len4_id, total_list
+from .maimaidx_music import get_cover_len4_id, total_list
 
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
@@ -95,8 +95,8 @@ class DrawBest(object):
         self.playerRating = playerRating
         self.musicRating = musicRating
         self.rankRating = self.playerRating - self.musicRating
-        self.pic_dir = 'src/static/mai/pic/'
-        self.cover_dir = 'src/static/mai/cover/'
+        self.pic_dir = STATIC + '/mai/pic/'
+        self.cover_dir = STATIC + '/mai/cover/'
         self.img = Image.open(self.pic_dir + 'UI_TTR_BG_Base_Plus.png').convert('RGBA')
         self.ROWS_IMG = [2]
         for i in range(6):
@@ -199,14 +199,14 @@ class DrawBest(object):
         rankPic = 'D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp'.split(' ')
         comboPic = ' FC FCp AP APp'.split(' ')
         imgDraw = ImageDraw.Draw(img)
-        titleFontName = 'src/static/adobe_simhei.otf'
+        titleFontName = STATIC + '/adobe_simhei.otf'
         for num in range(0, len(sdBest)):
             i = num // 5
             j = num % 5
             chartInfo = sdBest[num]
-            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
+            pngPath = self.pic_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
-                pngPath = self.cover_dir + '1000.png'
+                pngPath = self.pic_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -230,9 +230,9 @@ class DrawBest(object):
                 comboImg = Image.open(self.pic_dir + f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png').convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119, 27), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
+            font = ImageFont.truetype(STATIC + '/adobe_simhei.otf', 12, encoding='utf-8')
             tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
+            font = ImageFont.truetype(STATIC +'/adobe_simhei.otf', 18, encoding='utf-8')
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
@@ -242,7 +242,7 @@ class DrawBest(object):
         for num in range(len(sdBest), sdBest.size):
             i = num // 5
             j = num % 5
-            temp = Image.open(self.cover_dir + f'1000.png').convert('RGB')
+            temp = Image.open(self.pic_dir + f'1000.png').convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
@@ -251,9 +251,9 @@ class DrawBest(object):
             i = num // 3
             j = num % 3
             chartInfo = dxBest[num]
-            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
+            pngPath = self.pic_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
-                pngPath = self.cover_dir + '1000.png'
+                pngPath = self.pic_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -278,9 +278,9 @@ class DrawBest(object):
                     'RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119, 27), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
+            font = ImageFont.truetype(STATIC + '/adobe_simhei.otf', 12, encoding='utf-8')
             tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
+            font = ImageFont.truetype(STATIC + '/adobe_simhei.otf', 18, encoding='utf-8')
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
@@ -290,7 +290,7 @@ class DrawBest(object):
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
-            temp = Image.open(self.cover_dir + f'1000.png').convert('RGB')
+            temp = Image.open(self.pic_dir + f'1000.png').convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
@@ -309,7 +309,7 @@ class DrawBest(object):
         namePlateImg = Image.open(self.pic_dir + 'UI_TST_PlateMask.png').convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
-        font1 = ImageFont.truetype('src/static/msyh.ttc', 28, encoding='unic')
+        font1 = ImageFont.truetype(STATIC + '/msyh.ttc', 28, encoding='unic')
         namePlateDraw.text((12, 4), ' '.join(list(self.userName)), 'black', font1)
         nameDxImg = Image.open(self.pic_dir + 'UI_CMN_Name_DX.png').convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
@@ -318,7 +318,7 @@ class DrawBest(object):
 
         shougouImg = Image.open(self.pic_dir + 'UI_CMN_Shougou_Rainbow.png').convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
-        font2 = ImageFont.truetype('src/static/adobe_simhei.otf', 14, encoding='utf-8')
+        font2 = ImageFont.truetype(STATIC + '/adobe_simhei.otf', 14, encoding='utf-8')
         playCountInfo = f'底分: {self.musicRating} + 段位分: {self.rankRating}'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
@@ -386,7 +386,7 @@ def computeRa(ds: float, achievement:float) -> int:
     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 
 
-async def generate(payload: Dict) -> (Optional[Image.Image], bool):
+async def generate(payload: Dict) -> Tuple[Optional[Image.Image], bool]:
     async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/player", json=payload) as resp:
         if resp.status == 400:
             return None, 400

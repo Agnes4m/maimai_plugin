@@ -1,81 +1,38 @@
-# mai bot 使用指南
+<div align="center">
+  <img src="https://s2.loli.net/2022/06/16/opBDE8Swad5rU3n.png" width="180" height="180" alt="NoneBotPluginLogo">
+  <br>
+  <p><img src="https://s2.loli.net/2022/06/16/xsVUGRrkbn1ljTD.png" width="240" alt="NoneBotPluginText"></p>
+</div>
 
-此 README 提供了最低程度的 mai bot 教程与支持。
+<div align="center">
 
-**建议您至少拥有一定的编程基础之后再尝试使用本工具。**
+# nonebot_plugin_api
+_✨Nonebot2下非常简单的三方api接口操作✨_
 
-## Step 1. 安装 Python
+<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_api/stargazers">
+        <img alt="GitHub stars" src="https://img.shields.io/github/stars/Umamusume-Agnes-Digital/nonebot_plugin_api" alt="stars">
+</a>
+<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_api/issues">
+        <img alt="GitHub issues" src="https://img.shields.io/github/issues/Umamusume-Agnes-Digital/nonebot_plugin_api" alt="issues">
+</a>
+<a href="https://jq.qq.com/?_wv=1027&k=HdjoCcAe">
+        <img src="https://img.shields.io/badge/QQ%E7%BE%A4-399365126-orange?style=flat-square" alt="QQ Chat Group">
+</a>
+    <img src="https://img.shields.io/badge/python-3.7+-blue.svg" alt="python">
+    <img src="https://img.shields.io/badge/nonebot-2.0.0rc1+-red.svg" alt="NoneBot">
+</div>
 
-请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。
+## 说明
 
-在 Linux 系统上，可能需要其他方法安装 Python 3，请自行查找。
+从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0rc1
 
-## Step 2. 运行项目
+## 前置步骤（和原项目一样）
 
-建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
-
-在运行代码之前，您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并解压到`src`文件夹中。
+您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`nonebot_plugin_maimai`文件夹中。
 
 > 资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
 
-在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
-在 Windows 10 系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
-如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`Command Prompt`，`Powershell`以及`cd`命令的教程。
-
-之后，在打开的控制台中输入
-```
-python --version
-```
-控制台应该会打印出 Python 的版本。如果提示找不到 `python` 命令，请检查环境变量或干脆重装 Python，**并务必勾选 Add Python to system PATH**。
-
-之后，输入
-```
-pip install -r requirements.txt
-```
-安装依赖完成后，运行
-```
-python bot.py
-```
-运行项目。如果输出如下所示的内容，代表运行成功：
-```
-08-02 11:26:48 [INFO] nonebot | NoneBot is initializing...
-08-02 11:26:48 [INFO] nonebot | Current Env: prod
-08-02 11:26:49 [INFO] nonebot | Succeeded to import "maimaidx"
-08-02 11:26:49 [INFO] nonebot | Succeeded to import "public"
-08-02 11:26:49 [INFO] nonebot | Running NoneBot...
-08-02 11:26:49 [INFO] uvicorn | Started server process [5268]
-08-02 11:26:49 [INFO] uvicorn | Waiting for application startup.
-08-02 11:26:49 [INFO] uvicorn | Application startup complete.
-08-02 11:26:49 [INFO] uvicorn | Uvicorn running on http://127.0.0.1:10219 (Press CTRL+C to quit)
-```
-**运行成功后请勿关闭此窗口，后续需要与 CQ-HTTP 连接。**
-
-## Step 3. 连接 CQ-HTTP
-
-前往 https://github.com/Mrs4s/go-cqhttp > Releases，下载适合自己操作系统的可执行文件。
-go-cqhttp 在初次启动时会询问代理方式，选择反向 websocket 代理即可。
-
-之后用任何文本编辑器打开`config.yml`文件，设置反向 ws 地址、上报方式：
-```yml
-message:
-  post-format: array
-  
-servers:
-  - ws-reverse:
-      universal: ws://127.0.0.1:10219/onebot/v11/ws
-```
-然后设置您的 QQ 号和密码。您也可以不设置密码，选择扫码登陆的方式。
-
-登陆成功后，后台应该会发送一条类似的信息：
-```
-08-02 11:50:51 [INFO] nonebot | WebSocket Connection from CQHTTP Bot 114514 Accepted!
-```
-至此，您可以和对应的 QQ 号聊天并使用 mai bot 的所有功能了。
-
 ## FAQ
-
-不是 Windows 系统该怎么办？
-> 请自行查阅其他系统上的 Python 安装方式。cqhttp提供了其他系统的可执行文件，您也可以自行配置 golang module 环境进行编译。
 
 配置 nonebot 或 cq-http 过程中出错？
 > 请查阅 https://github.com/nonebot/nonebot2 以及 https://github.com/Mrs4s/go-cqhttp 中的文档。

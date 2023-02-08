@@ -3,11 +3,11 @@ from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-from src.libraries.tool import hash
-from src.libraries.maimaidx_music import *
-from src.libraries.image import *
-from src.libraries.maimai_best_40 import generate
-from src.libraries.maimai_best_50 import generate50
+from .libraries.tool import hash
+from .libraries.maimaidx_music import *
+from .libraries.image import *
+from .libraries.maimai_best_40 import generate
+from .libraries.maimai_best_50 import generate50
 import re
 
 

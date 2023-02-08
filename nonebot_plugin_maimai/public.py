@@ -3,7 +3,7 @@ from nonebot.typing import T_State
 from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
-from src.libraries.image import *
+from .libraries.image import *
 
 
 @event_preprocessor
