@@ -2,6 +2,7 @@ from nonebot import on_command, on_regex
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.plugin import PluginMetadata
 
 from .libraries.tool import hash
 from .libraries.maimaidx_music import *
@@ -9,6 +10,18 @@ from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
 import re
+
+
+__version__ = "0.0.1"
+__plugin_meta__ = PluginMetadata(
+    name="舞萌maimai",
+    description='要使用游客模式吗？',
+    usage='maimai查询操作',
+    extra={
+        "version": __version__,
+        "author": "Umamusume-Agnes-Digital <Z735803792@163.com>",
+    },
+)
 
 
 def song_txt(music: Music):

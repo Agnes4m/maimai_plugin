@@ -6,17 +6,17 @@
 
 <div align="center">
 
-# nonebot_plugin_api
-_✨Nonebot2下非常简单的三方api接口操作✨_
+# nonebot_plugin_maimai
+_✨maimaiDX，nonebot2插件版本✨_
 
-<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_api/stargazers">
-        <img alt="GitHub stars" src="https://img.shields.io/github/stars/Umamusume-Agnes-Digital/nonebot_plugin_api" alt="stars">
+<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_maimai/stargazers">
+        <img alt="GitHub stars" src="https://img.shields.io/github/stars/Umamusume-Agnes-Digital/nonebot_plugin_maimai" alt="stars">
 </a>
-<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_api/issues">
-        <img alt="GitHub issues" src="https://img.shields.io/github/issues/Umamusume-Agnes-Digital/nonebot_plugin_api" alt="issues">
+<a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_maimai/issues">
+        <img alt="GitHub issues" src="https://img.shields.io/github/issues/Umamusume-Agnes-Digital/nonebot_plugin_maimai" alt="issues">
 </a>
-<a href="https://jq.qq.com/?_wv=1027&k=HdjoCcAe">
-        <img src="https://img.shields.io/badge/QQ%E7%BE%A4-399365126-orange?style=flat-square" alt="QQ Chat Group">
+<a href="https://jq.qq.com/?_wv=1027&k=l82tMuPG">
+        <img src="https://img.shields.io/badge/QQ%E7%BE%A4-424506063-orange?style=flat-square" alt="QQ Chat Group">
 </a>
     <img src="https://img.shields.io/badge/python-3.7+-blue.svg" alt="python">
     <img src="https://img.shields.io/badge/nonebot-2.0.0rc1+-red.svg" alt="NoneBot">
@@ -26,7 +26,14 @@ _✨Nonebot2下非常简单的三方api接口操作✨_
 
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0rc1
 
+我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
+
 ## 前置步骤（和原项目一样）
+
+安装:
+    pip3 install nonebot_plugin_maimai
+    nb plugin install nonebot_plugin_maimai
+    # git clone 那我建议你还是用原作者的罢
 
 您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`nonebot_plugin_maimai`文件夹中。
 
@@ -54,6 +61,10 @@ XXXmaimaiXXX什么 | 随机一首歌
 [绿黄红紫白]id<歌曲编号> | 查询乐曲信息或谱面信息
 定数查歌 <定数> <br> 定数查歌 <定数下限> <定数上限> |  查询定数对应的乐曲
 分数线 <难度+歌曲id> <分数线> | 展示歌曲的分数线
+
+## 原作者
+
+[Diving-Fish](https://github.com/Diving-Fish),感谢大佬为音游人的无私奉献
 
 ## License
 
