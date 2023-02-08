@@ -12,11 +12,11 @@ from .libraries.maimai_best_50 import generate50
 import re
 from .public import poke,help
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='要使用游客模式吗？',
-    usage='maimai查询操作',
+    usage='指令：舞萌帮助',
     extra={
         "version": __version__,
         "author": "Umamusume-Agnes-Digital <Z735803792@163.com>",

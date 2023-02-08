@@ -12,7 +12,7 @@ async def preprocessor(bot, event, state):
         raise IgnoredException("not reply group temp message")
 
         
-help = on_command('help')
+help = on_command('help',aliases={'舞萌帮助','mai帮助'})
 
 
 @help.handle()
