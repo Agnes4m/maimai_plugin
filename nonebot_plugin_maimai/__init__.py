@@ -4,15 +4,16 @@ from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.plugin import PluginMetadata
 
+from .public import poke,help
 from .libraries.tool import hash
 from .libraries.maimaidx_music import *
 from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
 import re
-from .public import poke,help
 
-__version__ = "0.0.2"
+
+__version__ = "0.0.6"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='要使用游客模式吗？',

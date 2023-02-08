@@ -3,7 +3,7 @@ import random
 from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
 
-import requests
+import httpx
 
 def get_cover_len4_id(mid) -> str:
     mid = int(mid)
@@ -151,7 +151,7 @@ class MusicList(List[Music]):
         return new_list
 
 
-obj = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
+obj = httpx.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
 total_list: MusicList = MusicList(obj)
 for __i in range(len(total_list)):
     total_list[__i] = Music(total_list[__i])
