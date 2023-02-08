@@ -10,7 +10,7 @@ from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
 import re
-
+from .public import poke,help
 
 __version__ = "0.0.1"
 __plugin_meta__ = PluginMetadata(
