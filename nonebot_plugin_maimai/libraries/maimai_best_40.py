@@ -242,7 +242,7 @@ class DrawBest(object):
         for num in range(len(sdBest), sdBest.size):
             i = num // 5
             j = num % 5
-            temp = Image.open(self.pic_dir + f'1000.png').convert('RGB')
+            temp = Image.open(self.cover_dir + f'1000.png').convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
@@ -290,7 +290,7 @@ class DrawBest(object):
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
-            temp = Image.open(self.pic_dir + f'1000.png').convert('RGB')
+            temp = Image.open(self.cover_dir + f'1000.png').convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
@@ -301,7 +301,7 @@ class DrawBest(object):
         splashLogo = self._resizePic(splashLogo, 0.65)
         self.img.paste(splashLogo, (10, 10), mask=splashLogo.split()[3])
 
-        ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert('RGBA')
+        ratingBaseImg = Image.open(self.cover_dir + self._findRaPic()).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.85)
         self.img.paste(ratingBaseImg, (240, 8), mask=ratingBaseImg.split()[3])
