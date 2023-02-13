@@ -301,7 +301,7 @@ class DrawBest(object):
         splashLogo = self._resizePic(splashLogo, 0.65)
         self.img.paste(splashLogo, (10, 10), mask=splashLogo.split()[3])
 
-        ratingBaseImg = Image.open(self.cover_dir + self._findRaPic()).convert('RGBA')
+        ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.85)
         self.img.paste(ratingBaseImg, (240, 8), mask=ratingBaseImg.split()[3])

@@ -13,7 +13,7 @@ from .libraries.maimai_best_50 import generate50
 import re
 
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='指令：舞萌帮助',
