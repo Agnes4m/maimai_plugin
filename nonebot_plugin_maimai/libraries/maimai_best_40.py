@@ -204,9 +204,9 @@ class DrawBest(object):
             i = num // 5
             j = num % 5
             chartInfo = sdBest[num]
-            pngPath = self.pic_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
+            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
-                pngPath = self.pic_dir + '1000.png'
+                pngPath = self.cover_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -251,9 +251,9 @@ class DrawBest(object):
             i = num // 3
             j = num % 3
             chartInfo = dxBest[num]
-            pngPath = self.pic_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
+            pngPath = self.cover_dir + f'{get_cover_len4_id(chartInfo.idNum)}.png'
             if not os.path.exists(pngPath):
-                pngPath = self.pic_dir + '1000.png'
+                pngPath = self.cover_dir + '1000.png'
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
