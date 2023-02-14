@@ -3,6 +3,7 @@ from nonebot.typing import T_State
 from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
+from nonebot_plugin_txt2img import Txt2Img
 from .libraries.image import *
 
 
@@ -27,11 +28,16 @@ XXXmaimaiXXX什么 随机一首歌
 定数查歌 <定数>  查询定数对应的乐曲
 定数查歌 <定数下限> <定数上限>
 分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看'''
-    await help.send(Message([
-        MessageSegment("image", {
-            "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
-        })
-    ]))
+    # await help.send(Message([
+    #     MessageSegment("image", {
+    #         "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+    #     })
+    # ]))
+    title = '可用命令如下：'
+    txt2img = Txt2Img()
+    txt2img.set_font_size(font_size = 32)
+    pic = txt2img.draw(title, help_str)
+    await help.send(MessageSegment.image(pic))
 
 
 async def _group_poke(bot: Bot, event: Event) -> bool:
