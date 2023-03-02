@@ -17,7 +17,7 @@ except:
     import json
 
 
-__version__ = "0.0.9"
+__version__ = "0.1.0"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='指令：舞萌帮助',
