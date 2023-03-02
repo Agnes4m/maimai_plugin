@@ -11,6 +11,10 @@ from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
 import re
+try:
+    import ujson as json
+except:
+    import json
 
 
 __version__ = "0.0.9"
@@ -285,7 +289,11 @@ best_40_pic = on_command('b40')
 @best_40_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
-    if username == "":
+    at = await get_message_at(event.json())
+    usr_id = at_to_usrid(at)
+    if at:
+        payload = {'qq': usr_id}
+    elif username == "":
         payload = {'qq': str(event.get_user_id())}
     else:
         payload = {'username': username}
@@ -307,7 +315,11 @@ best_50_pic = on_command('b50')
 @best_50_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
-    if username == "":
+    at = await get_message_at(event.json())
+    usr_id = at_to_usrid(at)
+    if at:
+        payload = {'qq': usr_id,'b50':True}
+    elif username == "":
         payload = {'qq': str(event.get_user_id()),'b50':True}
     else:
         payload = {'username': username,'b50':  True}
@@ -322,3 +334,28 @@ async def _(event: Event, message: Message = CommandArg()):
                 "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"
             })
         ]))
+        
+async def get_message_at(data: str) -> list:
+    '''
+    获取at列表
+    :param data: event.json()
+    抄的groupmate_waifu
+    '''
+    qq_list = []
+    data = json.loads(data)
+    try:
+        for msg in data['message']:
+            if msg['type'] == 'at':
+                qq_list.append(int(msg['data']['qq']))
+        return qq_list
+    except Exception:
+        return []
+    
+def at_to_usrid(at):
+    """at对象变qqid否则返回usr_id"""
+    if at != []:
+        at:str = at[0]
+        usr_id:str = at
+        return usr_id
+    else:
+        return None
