@@ -26,6 +26,10 @@ _✨maimaiDX，nonebot2插件版本✨_
 
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0rc1
 
+修改部分：
+ - b40/b50可以艾特人查询
+ - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
+
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
 ## 前置步骤（和原项目一样）
@@ -36,7 +40,7 @@ _✨maimaiDX，nonebot2插件版本✨_
     nb plugin install nonebot_plugin_maimai
     # git clone 那我建议你还是用原作者的罢
 
-您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`nonebot_plugin_maimai`文件夹中。
+您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`nonebot_plugin_maimai`文件夹|/data/maimai/static中。
 
 > 资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
 
