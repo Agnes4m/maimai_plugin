@@ -1,4 +1,4 @@
-from nonebot import on_command, on_regex
+from nonebot import on_command, on_regex,get_driver
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
@@ -16,6 +16,8 @@ try:
 except:
     import json
 
+driver = get_driver()
+nickname = list(driver.config.nickname)[0]
 
 __version__ = "0.1.0"
 __plugin_meta__ = PluginMetadata(

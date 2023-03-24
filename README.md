@@ -40,7 +40,10 @@ _✨maimaiDX，nonebot2插件版本✨_
     nb plugin install nonebot_plugin_maimai
     # git clone 那我建议你还是用原作者的罢
 
-您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`nonebot_plugin_maimai`文件夹|/data/maimai/static中。
+您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:(以下方法2选1)
+
+ - pypi`nonebot_plugin_maimai`文件夹中 - 最终路径类似是/path/to/nonebot_plugin_maimai/static
+ - 机器人目录下 - 最终路径类似是/path/to/data/maimai/static中。其中bot.py文件在/path/to位置
 
 > 资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
 
