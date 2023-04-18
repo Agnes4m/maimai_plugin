@@ -6,6 +6,7 @@ from nonebot.message import event_preprocessor
 from nonebot_plugin_txt2img import Txt2Img
 from nonebot import get_driver
 from nonebot.params import CommandArg
+from nonebot.matcher import Matcher
 from .libraries.image import *
 
 from bs4 import BeautifulSoup
@@ -17,11 +18,11 @@ import json
 try:
     maimai_font: str = get_driver().config.maimai_font
 except:
-    maimai_font: str = 'simsun.ttf'
+    maimai_font: str = 'simsun.ttc'
 try:
     b_cookie: str = get_driver().config.b_cookie
 except:
-    b_cookie: str = 'simsun.ttf'
+    b_cookie: str = ''
 
 @event_preprocessor
 async def preprocessor(bot, event, state):
@@ -33,7 +34,7 @@ help = on_command('help',aliases={'舞萌帮助','mai帮助'})
 
 
 @help.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _():
     help_str = '''可用命令如下：
 今日舞萌 查看今天的舞萌运势
 XXXmaimaiXXX什么 随机一首歌
@@ -62,16 +63,27 @@ XXXmaimaiXXX什么 随机一首歌
 
 search = on_command('search',aliases={'b站搜索','mai搜索'})
 @search.handle()
-async def _(arg:Message = CommandArg()):
+async def _(state: T_State,matcher:Matcher ,arg:Message = CommandArg()):
     msg = arg.extract_plain_text()
-    data_list = await get_target(msg)
+    data_list:List[Dict[str,Dict[str,str]]] = await get_target(msg)
+    state['msg'] = data_list
     result_img = await data_to_img(data_list)
     img = BytesIO()
     result_img.save(img,format="png")
     img_bytes = img.getvalue()
-    await search.finish(MessageSegment.image(img_bytes))
+    await matcher.send(MessageSegment.image(img_bytes))
 
-
+@search.got("tap",prompt="请输入需要的序号")
+async def _(state: T_State,matcher:Matcher ):
+    tag:Message = state['tap']
+    tag = tag.extract_plain_text()
+    if tag.isdigit() and int(tag) in range(1, 10):
+        msg:List[Dict[str,Dict[str,str]]] = state['msg']
+        Url = msg[int(tag)-1]['url']['视频链接:']
+        print(msg[int(tag)-1])
+        await matcher.finish(Url)
+    
+    
 async def get_target(keyword:str):
     headers = {
     'User-Agent':
@@ -81,69 +93,88 @@ async def get_target(keyword:str):
 
     mainUrl='https://search.bilibili.com/all?keyword='+keyword
     mainSoup = BeautifulSoup(httpx.get(url = mainUrl, headers= headers).text, "html.parser")
-    viedoNum = 0
+    viedoNum = 1
     msg_list = []
     for item in mainSoup.find_all('div',class_="bili-video-card"):
         item:BeautifulSoup
-        viedoNum += 1
         msg = {'data':{},'url':{}}
+        # try:
+        msg['data']['序号:'] = '第'+ viedoNum.__str__() + '个视频:'
+        val=item.find('div',class_="bili-video-card__info--right")
+        msg['data']['视频标题:'] =  val.find('h3',class_="bili-video-card__info--tit")['title']
+        msg['url']['视频链接:'] = 'https:'+ val.find('a')['href'] + '\n'
         try:
-            msg['data']['序号:'] = '第'+ viedoNum.__str__() + '个视频:'
-            val=item.find('div',class_="bili-video-card__info--right")
-            msg['data']['视频标题:'] =  val.find('h3',class_="bili-video-card__info--tit")['title']
-            msg['url']['视频链接:'] = 'https:'+ val.find('a')['href'] + '\n'
             msg['data']['up主:'] = item.find('span',class_="bili-video-card__info--author").text.strip()
             msg['data']['视频观看量:'] = item.select('span.bili-video-card__stats--item span')[0].text.strip()
-            msg['data']['弹幕量:'] =  item.select('span.bili-video-card__stats--item span')[1].text.strip()
-            msg['data']['上传时间:'] = item.find('span',class_='bili-video-card__info--date').text.strip()
-            msg['data']['视频时长:'] = item.find('span',class_='bili-video-card__stats__duration').text.strip()
-            msg['url']['封面:'] = 'https:'+ item.find('img').get('src')
-        except:
+        except (AttributeError,IndexError):
             continue
+        
+        msg['data']['弹幕量:'] =  item.select('span.bili-video-card__stats--item span')[1].text.strip()
+        msg['data']['上传时间:'] = item.find('span',class_='bili-video-card__info--date').text.strip()
+        msg['data']['视频时长:'] = item.find('span',class_='bili-video-card__stats__duration').text.strip()
+        msg['url']['封面:'] = 'https:'+ item.find('img').get('src')
+        # except:
+        #     continue
         print(json.dumps(msg,indent=4,ensure_ascii=False) )
         msg_list.append(msg)
         if viedoNum == 9:
             break
+        viedoNum += 1
     return msg_list
 
 
-async def data_to_img(msg_list:List[Dict[str,dict]]):
-    
-    # 定义常量
-    PADDING = 30
-    FONT_SIZE = 40
-    LINE_SPACING = 20
-    TEXT_COLOR = (255, 255, 255, 255)
-    response = httpx.get(url = msg_list[0]['url']['封面:'])
-    img = Image.open(BytesIO(response.content))
+async def make_dict_img(data: Dict[str, str], cell_width: int, cell_height: int, font_size: int) -> Image:
+    img = Image.new('RGBA', (cell_width, cell_height), color=(255, 255, 255, 255))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype(maimai_font, font_size)
 
-    # 计算宽高和每个格子的宽高
-    width, height = img.size
-    cell_width = (width - PADDING * 2) // 3
-    cell_height = (height - PADDING * 2) // 3
+    i = 0
+    for k, v in data.items():
+        lentext = f"{k}{v}"
+        while len(lentext) > 0:
+            draw.text((10, i * (font_size + 5)), lentext[:25], font=font, fill=(0, 0, 0, 255))
+            lentext = lentext[25:]
+            i += 1
 
-    # 新建一张空白图片
-    result_img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    return img
 
-    # 获取字体
-    print(maimai_font)
-    font = ImageFont.truetype(maimai_font,30)
-    for data in msg_list:
-        # 在每个格子中插入图片和文字
-        for i, d in enumerate(data['data']):
-            # 计算格子的左上角坐标
-            x = (i % 3) * cell_width + PADDING
-            y = (i // 3) * cell_height + PADDING
 
-            # 将图片缩放并插入到格子中
-            response =  httpx.get(data['url']['封面:'])
-            image = Image.open(BytesIO(response.content)).resize((cell_width, cell_height), Image.ANTIALIAS)
-            result_img.paste(image, (x, y))
+async def data_to_img(msg_list: List[Dict[str, Dict[str, str]]], cell_width=1080//3, cell_height=1920//3, font_size=20) -> Image:
+    cols = 3
+    rows = 3
 
-            # 绘制文字
-            draw = ImageDraw.Draw(result_img)
-            text = '\n'.join(list(d.values()))
-            w, h = draw.multiline_textsize(text, font=font)
-            draw.text((x + cell_width / 2 - w / 2, y + cell_height), text, fill=TEXT_COLOR, font=font, align='center', spacing=LINE_SPACING)
+    # 创建一张1080*1920的空白图
+    result_img = Image.new('RGBA', (cell_width * cols, cell_height * rows), color=(255, 255, 255, 255))
+
+    # 将每个dict对象转换成包含两个dict对象的列表
+    data_list = []
+    for msg in msg_list:
+        data = msg['data']
+        url = msg['url']
+        data_list.append((url, data))
+
+    for i, (url, data) in enumerate(data_list):
+        # 将图片缩放并插入到格子中
+        response = httpx.get(url = url['封面:'],headers= {
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
+    })
+        image = Image.open(BytesIO(response.content))
+        img_width, img_height = image.size
+        ratio = min(cell_width/img_width, cell_height/img_height)
+        new_width = int(img_width*ratio)
+        new_height = int(img_height*ratio)
+        image = image.resize((new_width, new_height), Image.ANTIALIAS)
+        img_x = ((i % cols) * cell_width) + ((cell_width - new_width) // 2)
+        img_y = ((i // cols) * cell_height) + ((cell_height - new_height-200) // 2)
+        result_img.paste(image, (img_x, img_y))
+ 
+
+        # 添加文字信息到下方
+        dict_img = await make_dict_img(data, cell_width, cell_height, font_size)
+        dict_x = ((i % cols) * cell_width) + ((cell_width - dict_img.size[0]) // 2)
+        dict_y = ((i // cols) * cell_height) + new_height + ((cell_height - new_height - font_size - dict_img.size[1]) // 2) + new_height*1
+        result_img.paste(dict_img, (dict_x, dict_y))
 
     return result_img
+
