@@ -29,7 +29,8 @@ _✨maimaiDX，nonebot2插件版本✨_
 修改部分：
  - b40/b50可以艾特人查询
  - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
- - env设置 `maimai_font
+ - env设置 `maimai_font`和`b_cookie`,分别是str对象的`字体`和`cookie`
+ - 新增指令`b站搜索[text]`
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
