@@ -17,7 +17,10 @@ except:
     import json
 
 driver = get_driver()
-nickname = list(driver.config.nickname)[0]
+try:
+    nickname = list(driver.config.nickname)[0]
+except:
+    nickname = "宁宁"
 
 __version__ = "0.1.0"
 __plugin_meta__ = PluginMetadata(
