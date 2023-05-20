@@ -11,7 +11,7 @@ from .libraries.image import *
 
 from bs4 import BeautifulSoup
 from typing import Dict,List
-import httpx
+import aiohttp
 from io import BytesIO
 import json
 
@@ -83,6 +83,10 @@ async def _(state: T_State,matcher:Matcher ):
         print(msg[int(tag)-1])
         await matcher.finish(Url)
     
+async def fetch_page(url, headers):
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url) as response:
+            return await response.text()    
     
 async def get_target(keyword:str):
     headers = {
@@ -92,7 +96,8 @@ async def get_target(keyword:str):
     }
 
     mainUrl='https://search.bilibili.com/all?keyword='+keyword
-    mainSoup = BeautifulSoup(httpx.get(url = mainUrl, headers= headers).text, "html.parser")
+    content = await fetch_page(mainUrl, headers)
+    mainSoup = BeautifulSoup(content, "html.parser")
     viedoNum = 1
     msg_list = []
     for item in mainSoup.find_all('div',class_="bili-video-card"):
@@ -155,11 +160,11 @@ async def data_to_img(msg_list: List[Dict[str, Dict[str, str]]], cell_width=1080
 
     for i, (url, data) in enumerate(data_list):
         # 将图片缩放并插入到格子中
-        response = httpx.get(url = url['封面:'],headers= {
-        'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
-    })
-        image = Image.open(BytesIO(response.content))
+        image_content = await fetch_page(url['封面:'], headers={
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
+        })
+        image = Image.open(BytesIO(image_content))
         img_width, img_height = image.size
         ratio = min(cell_width/img_width, cell_height/img_height)
         new_width = int(img_width*ratio)
