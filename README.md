@@ -24,7 +24,7 @@ _✨maimaiDX，nonebot2插件版本✨_
 
 ## 说明
 
-从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0rc1
+从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0
 
 修改部分：
  - b40/b50可以艾特人查询
