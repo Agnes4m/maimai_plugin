@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://s2.loli.net/2022/06/16/opBDE8Swad5rU3n.png" width="180" height="180" alt="NoneBotPluginLogo">
+  <img src="https://raw.githubusercontent.com/Agnes4m/nonebot_plugin_l4d2_server/main/image/logo.png" width="180" height="180" alt="NoneBotPluginLogo">
   <br>
   <p><img src="https://s2.loli.net/2022/06/16/xsVUGRrkbn1ljTD.png" width="240" alt="NoneBotPluginText"></p>
 </div>
@@ -18,29 +18,29 @@ _✨maimaiDX，nonebot2插件版本✨_
 <a href="https://jq.qq.com/?_wv=1027&k=l82tMuPG">
         <img src="https://img.shields.io/badge/QQ%E7%BE%A4-424506063-orange?style=flat-square" alt="QQ Chat Group">
 </a>
-    <img src="https://img.shields.io/badge/python-3.7+-blue.svg" alt="python">
-    <img src="https://img.shields.io/badge/nonebot-2.0.0rc1+-red.svg" alt="NoneBot">
+    <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
+    <img src="https://img.shields.io/badge/nonebot-2.0.0-red.svg" alt="NoneBot">
 </div>
 
-## 说明
+## 说明（已更新舞萌国服2023，重新下载资源）
 
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0
 
 修改部分：
  - b40/b50可以艾特人查询
  - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
- - env设置 `maimai_font`和`b_cookie`,分别是str对象的`字体`和`cookie`
+ - （可循）env设置 `maimai_font`,是str对象的`字体`
  - 新增指令`b站搜索[text]`
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
 ## 前置步骤（和原项目一样）
 
-安装:
+安装（仍选其一）:
 
     pip3 install nonebot_plugin_maimai
     nb plugin install nonebot_plugin_maimai
-    # git clone 那我建议你还是用原作者的罢
+    git clone https://github.com/Agnes4m/nonebot_plugin_maimai.git
 
 您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:(以下方法2选1)
 
