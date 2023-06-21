@@ -3,13 +3,13 @@ import random
 from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
 
-import httpx
+import aiohttp,asyncio
 
-def get_cover_len4_id(mid) -> str:
+def get_cover_len5_id(mid) -> str:
     mid = int(mid)
-    if 10001 <= mid:
+    if mid > 10000 and mid <= 11000:
         mid -= 10000
-    return f'{mid:04d}'
+    return f'{mid:05d}'
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
@@ -151,9 +151,19 @@ class MusicList(List[Music]):
         return new_list
 
 
-obj = httpx.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-total_list: MusicList = MusicList(obj)
-for __i in range(len(total_list)):
-    total_list[__i] = Music(total_list[__i])
-    for __j in range(len(total_list[__i].charts)):
-        total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
+async def main():
+    global obj,total_list
+    async def fetch_json(url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                return await response.json()
+
+    obj = await fetch_json('https://www.diving-fish.com/api/maimaidxprober/music_data')
+    total_list = MusicList(obj)
+    for __i in range(len(total_list)):
+        total_list[__i] = Music(total_list[__i])
+        for __j in range(len(total_list[__i].charts)):
+            total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
+    
+asyncio.run(main())
+

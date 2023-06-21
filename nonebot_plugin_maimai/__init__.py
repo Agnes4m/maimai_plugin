@@ -65,6 +65,8 @@ __plugin_meta__ = PluginMetadata(
     usage=logo,
     type="application",
     usage='指令：舞萌帮助',
+    type="application",
+    homepage="https://github.com/Agnes4m/nonebot_plugin_maimai",
     supported_adapters={"~onebot.v11"},
     extra={
         "version": __version__,
@@ -78,7 +80,7 @@ def song_txt(music: Music):
             "text": f"{music.id}. {music.title}\n"
         }),
         MessageSegment("image", {
-            "file": f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+            "file": f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"
         }),
         MessageSegment("text", {
             "text": f"\n{'/'.join(music.level)}"
@@ -200,7 +202,7 @@ async def _(event: Event, message: Message = EventMessage()):
             chart = music['charts'][level_index]
             ds = music['ds'][level_index]
             level = music['level'][level_index]
-            file = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
+            file = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} {level}({ds})
 TAP: {chart['notes'][0]}
@@ -233,7 +235,7 @@ BREAK: {chart['notes'][4]}
         name = groups[1]
         music = total_list.by_id(name)
         try:
-            file =f"https://www.diving-fish.com/covers/{get_cover_len4_id(music['id'])}.png"
+            file =f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
             await query_chart.send(Message([
                 MessageSegment("text", {
                     "text": f"{music['id']}. {music['title']}\n"
