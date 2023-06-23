@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot_plugin_maimai"
-version = "0.2.2"
+version = "0.2.3"
 description= "Maimai DX plugin for NoneBot"
 authors = ["Agnes_Digital <Z735803792@163.com>"]
 license = "MIT"
