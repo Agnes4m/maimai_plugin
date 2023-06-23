@@ -1,3 +1,6 @@
+from nonebot import require
+require('nonebot_plugin_htmlrender')
+require('nonebot_plugin_txt2img')
 from nonebot import on_command, on_regex,get_driver
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
