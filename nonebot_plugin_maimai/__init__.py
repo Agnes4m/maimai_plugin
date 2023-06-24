@@ -61,7 +61,7 @@ logo ="""
     @Oooo\/]OOOOOO/  .  \.=^....,..........[.,OO^=^.    /    ,`\OO`.....
     """
 
-__version__ = "0.1.3"
+__version__ = "0.2.3"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='指令：舞萌帮助',
