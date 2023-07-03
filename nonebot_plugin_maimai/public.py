@@ -4,8 +4,9 @@ from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
 from nonebot_plugin_txt2img import Txt2Img
+from nonebot.log import logger
 from nonebot import get_driver
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg,RawCommand
 from nonebot.matcher import Matcher
 from .libraries.image import *
 
@@ -14,6 +15,7 @@ from typing import Dict,List
 import aiohttp
 from io import BytesIO
 import json
+import random
 
 try:
     maimai_font: str = get_driver().config.maimai_font
@@ -61,26 +63,37 @@ XXXmaimaiXXX什么 随机一首歌
 
 
 
-search = on_command('search',aliases={'b站搜索','mai搜索'})
+search = on_command('搜手元',aliases={'搜理论','搜谱面确认'})
 @search.handle()
-async def _(state: T_State,matcher:Matcher ,arg:Message = CommandArg()):
+async def _(state: T_State,matcher:Matcher ,command: str = RawCommand(),arg:Message = CommandArg()):
+    keyword = command.replace('搜','')
     msg = arg.extract_plain_text()
-    data_list:List[Dict[str,Dict[str,str]]] = await get_target(msg)
+    if not msg:
+        await matcher.finish('请把要搜索的内容放在后面哦')
+    data_list:List[Dict[str,Dict[str,str]]] = await get_target(keyword+msg)
     state['msg'] = data_list
-    result_img = await data_to_img(data_list)
-    img = BytesIO()
-    result_img.save(img,format="png")
-    img_bytes = img.getvalue()
-    await matcher.send(MessageSegment.image(img_bytes))
+    
+    choice_dict = random.randint(1,len(data_list))
+#     result_img = await data_to_img(data_list)
+#     img = BytesIO()
+#     result_img.save(img,format="png")
+#     img_bytes = img.getvalue()
+#     await matcher.send(MessageSegment.image(img_bytes))
 
-@search.got("tap",prompt="请输入需要的序号")
-async def _(state: T_State,matcher:Matcher ):
-    tag:Message = state['tap']
-    tag = tag.extract_plain_text()
-    if tag.isdigit() and int(tag) in range(1, 10):
-        msg:List[Dict[str,Dict[str,str]]] = state['msg']
-        Url = msg[int(tag)-1]['url']['视频链接:']
-        print(msg[int(tag)-1])
+# @search.got("tap",prompt="请输入需要的序号")
+# async def _(state: T_State,matcher:Matcher ):
+    # tags:Message = state['tap']
+    # tag = tags.extract_plain_text()
+    # if tag.isdigit() and int(tag) in range(1, 10):
+    
+        # msg:List[Dict[str,Dict[str,str]]] = state['msg']
+    Url = msg[int(choice_dict)-1]['url']['视频链接:']
+    title = msg[int(choice_dict)-1]['data']['视频标题:']
+    await matcher.send(title)
+    try:
+        await matcher.finish(MessageSegment.video(Url))
+    except Exception as E:
+        logger.warning(E)
         await matcher.finish(Url)
     
 async def fetch_page(url, headers):

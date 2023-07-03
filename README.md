@@ -18,7 +18,7 @@ _✨maimaiDX，nonebot2插件版本✨_
 <a href="https://jq.qq.com/?_wv=1027&k=l82tMuPG">
         <img src="https://img.shields.io/badge/QQ%E7%BE%A4-424506063-orange?style=flat-square" alt="QQ Chat Group">
 </a>
-    <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
+    <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
     <img src="https://img.shields.io/badge/nonebot-2.0.0-red.svg" alt="NoneBot">
 </div>
 
@@ -30,9 +30,13 @@ _✨maimaiDX，nonebot2插件版本✨_
  - b40/b50可以艾特人查询
  - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
  - （可循）env设置 `maimai_font`,是str对象的`字体`
- - 新增指令`b站搜索[text]`
+ - 新增指令`搜手元`,`搜理论`,`搜谱面确认`，后面带上搜索的对象
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
+
+## env(可选)
+
+        maimai_font = 'simsun.ttc'  # 替换你有的字体
 
 ## 前置步骤（和原项目一样）
 
@@ -71,6 +75,7 @@ XXXmaimaiXXX什么 | 随机一首歌
 [绿黄红紫白]id<歌曲编号> | 查询乐曲信息或谱面信息
 定数查歌 <定数> <br> 定数查歌 <定数下限> <定数上限> |  查询定数对应的乐曲
 分数线 <难度+歌曲id> <分数线> | 展示歌曲的分数线
+搜<手元><理论><谱面确认> | 从b站获取对应的手元视频
 
 ## 原作者
 
