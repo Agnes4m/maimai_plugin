@@ -65,13 +65,13 @@ XXXmaimaiXXX什么 随机一首歌
 
 search = on_command('搜手元',aliases={'搜理论','搜谱面确认'})
 @search.handle()
-async def _(state: T_State,matcher:Matcher ,command: str = RawCommand(),arg:Message = CommandArg()):
+async def _(matcher:Matcher ,command: str = RawCommand(),arg:Message = CommandArg()):
     keyword = command.replace('搜','')
-    msg = arg.extract_plain_text()
-    if not msg:
+    msgs = arg.extract_plain_text()
+    if not msgs:
         await matcher.finish('请把要搜索的内容放在后面哦')
-    data_list:List[Dict[str,Dict[str,str]]] = await get_target(keyword+msg)
-    state['msg'] = data_list
+    data_list:List[Dict[str,Dict[str,str]]] = await get_target(keyword+msgs)
+    msg= data_list
     
     choice_dict = random.randint(1,len(data_list))
 #     result_img = await data_to_img(data_list)
@@ -141,58 +141,58 @@ async def get_target(keyword:str):
     return msg_list
 
 
-async def make_dict_img(data: Dict[str, str], cell_width: int, cell_height: int, font_size: int) -> Image:
-    img = Image.new('RGBA', (cell_width, cell_height), color=(255, 255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype(maimai_font, font_size)
+# async def make_dict_img(data: Dict[str, str], cell_width: int, cell_height: int, font_size: int) -> Image:
+#     img = Image.new('RGBA', (cell_width, cell_height), color=(255, 255, 255, 255))
+#     draw = ImageDraw.Draw(img)
+#     font = ImageFont.truetype(maimai_font, font_size)
 
-    i = 0
-    for k, v in data.items():
-        lentext = f"{k}{v}"
-        while len(lentext) > 0:
-            draw.text((10, i * (font_size + 5)), lentext[:25], font=font, fill=(0, 0, 0, 255))
-            lentext = lentext[25:]
-            i += 1
+#     i = 0
+#     for k, v in data.items():
+#         lentext = f"{k}{v}"
+#         while len(lentext) > 0:
+#             draw.text((10, i * (font_size + 5)), lentext[:25], font=font, fill=(0, 0, 0, 255))
+#             lentext = lentext[25:]
+#             i += 1
 
-    return img
+#     return img
 
 
-async def data_to_img(msg_list: List[Dict[str, Dict[str, str]]], cell_width=1080//3, cell_height=1920//3, font_size=20) -> Image:
-    cols = 3
-    rows = 3
+# async def data_to_img(msg_list: List[Dict[str, Dict[str, str]]], cell_width=1080//3, cell_height=1920//3, font_size=20) -> Image:
+#     cols = 3
+#     rows = 3
 
-    # 创建一张1080*1920的空白图
-    result_img = Image.new('RGBA', (cell_width * cols, cell_height * rows), color=(255, 255, 255, 255))
+#     # 创建一张1080*1920的空白图
+#     result_img = Image.new('RGBA', (cell_width * cols, cell_height * rows), color=(255, 255, 255, 255))
 
-    # 将每个dict对象转换成包含两个dict对象的列表
-    data_list = []
-    for msg in msg_list:
-        data = msg['data']
-        url = msg['url']
-        data_list.append((url, data))
+#     # 将每个dict对象转换成包含两个dict对象的列表
+#     data_list = []
+#     for msg in msg_list:
+#         data = msg['data']
+#         url = msg['url']
+#         data_list.append((url, data))
 
-    for i, (url, data) in enumerate(data_list):
-        # 将图片缩放并插入到格子中
-        image_content = await fetch_page(url['封面:'], headers={
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
-        })
-        image = Image.open(BytesIO(image_content))
-        img_width, img_height = image.size
-        ratio = min(cell_width/img_width, cell_height/img_height)
-        new_width = int(img_width*ratio)
-        new_height = int(img_height*ratio)
-        image = image.resize((new_width, new_height), Image.ANTIALIAS)
-        img_x = ((i % cols) * cell_width) + ((cell_width - new_width) // 2)
-        img_y = ((i // cols) * cell_height) + ((cell_height - new_height-200) // 2)
-        result_img.paste(image, (img_x, img_y))
+#     for i, (url, data) in enumerate(data_list):
+#         # 将图片缩放并插入到格子中
+#         image_content = await fetch_page(url['封面:'], headers={
+#             'User-Agent':
+#                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
+#         })
+#         image = Image.open(BytesIO(image_content))
+#         img_width, img_height = image.size
+#         ratio = min(cell_width/img_width, cell_height/img_height)
+#         new_width = int(img_width*ratio)
+#         new_height = int(img_height*ratio)
+#         image = image.resize((new_width, new_height), Image.ANTIALIAS)
+#         img_x = ((i % cols) * cell_width) + ((cell_width - new_width) // 2)
+#         img_y = ((i // cols) * cell_height) + ((cell_height - new_height-200) // 2)
+#         result_img.paste(image, (img_x, img_y))
  
 
-        # 添加文字信息到下方
-        dict_img = await make_dict_img(data, cell_width, cell_height, font_size)
-        dict_x = ((i % cols) * cell_width) + ((cell_width - dict_img.size[0]) // 2)
-        dict_y = ((i // cols) * cell_height) + new_height + ((cell_height - new_height - font_size - dict_img.size[1]) // 2) + new_height*1
-        result_img.paste(dict_img, (dict_x, dict_y))
+#         # 添加文字信息到下方
+#         dict_img = await make_dict_img(data, cell_width, cell_height, font_size)
+#         dict_x = ((i % cols) * cell_width) + ((cell_width - dict_img.size[0]) // 2)
+#         dict_y = ((i // cols) * cell_height) + new_height + ((cell_height - new_height - font_size - dict_img.size[1]) // 2) + new_height*1
+#         result_img.paste(dict_img, (dict_x, dict_y))
 
-    return result_img
+#     return result_img
 
