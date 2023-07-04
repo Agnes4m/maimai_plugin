@@ -60,7 +60,7 @@ logo ="""
     @Oooo\/]OOOOOO/  .  \.=^....,..........[.,OO^=^.    /    ,`\OO`.....
     """
 
-__version__ = "0.3.0"
+__version__ = "0.3.2"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description='指令：舞萌帮助',

@@ -1,6 +1,5 @@
-from nonebot import on_command, on_notice
-from nonebot.typing import T_State
-from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
+from nonebot import on_command
+from nonebot.adapters.onebot.v11 import Message,  MessageSegment
 from nonebot.exception import IgnoredException
 from nonebot.message import event_preprocessor
 from nonebot_plugin_txt2img import Txt2Img
@@ -11,11 +10,16 @@ from nonebot.matcher import Matcher
 from .libraries.image import *
 
 from bs4 import BeautifulSoup
+from pathlib import Path
 from typing import Dict,List
 import aiohttp
-from io import BytesIO
+import os
 import json
 import random
+import subprocess
+import httpx
+import re
+import asyncio
 
 try:
     maimai_font: str = get_driver().config.maimai_font
@@ -25,6 +29,12 @@ try:
     b_cookie: str = get_driver().config.b_cookie
 except:
     b_cookie: str = ''
+headers = {
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
+    'cookie': b_cookie
+    }
+
 
 @event_preprocessor
 async def preprocessor(bot, event, state):
@@ -46,7 +56,8 @@ XXXmaimaiXXX什么 随机一首歌
 <歌曲别名>是什么歌 查询乐曲别名对应的乐曲
 定数查歌 <定数>  查询定数对应的乐曲
 定数查歌 <定数下限> <定数上限>
-分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看'''
+分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看
+搜<手元><理论><谱面确认>'''
     # await help.send(Message([
     #     MessageSegment("image", {
     #         "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
@@ -91,7 +102,8 @@ async def _(matcher:Matcher ,command: str = RawCommand(),arg:Message = CommandAr
     title = msg[int(choice_dict)-1]['data']['视频标题:']
     await matcher.send(title)
     try:
-        await matcher.finish(MessageSegment.video(Url))
+        await b_to_url(Url,matcher=matcher)
+        # await matcher.finish(MessageSegment.video(Url))
     except Exception as E:
         logger.warning(E)
         await matcher.finish(Url)
@@ -102,11 +114,7 @@ async def fetch_page(url, headers):
             return await response.text()    
     
 async def get_target(keyword:str):
-    headers = {
-    'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
-    'cookie': b_cookie
-    }
+
 
     mainUrl='https://search.bilibili.com/all?keyword='+keyword
     content = await fetch_page(mainUrl, headers)
@@ -140,59 +148,93 @@ async def get_target(keyword:str):
         viedoNum += 1
     return msg_list
 
+def getDownloadUrl(url: str):
+    """
+        爬取下载链接
+    :param url:
+    :return:
+    """
+    with httpx.Client(follow_redirects=True) as client:
+        resp = client.get(url, headers=headers)
+        info = re.search(r"<script>window\.__playinfo__=({.*})<\/script><script>", resp.text)[1]
+        res = json.loads(info)
+        videoUrl = res["data"]["dash"]["video"][0]["baseUrl"] or res["data"]["dash"]["video"][0]["backupUrl"][0]
+        audioUrl = res["data"]["dash"]["audio"][0]["baseUrl"] or res["data"]["dash"]["audio"][0]["backupUrl"][0]
+        if videoUrl != "" and audioUrl != "":
+            return videoUrl, audioUrl
 
-# async def make_dict_img(data: Dict[str, str], cell_width: int, cell_height: int, font_size: int) -> Image:
-#     img = Image.new('RGBA', (cell_width, cell_height), color=(255, 255, 255, 255))
-#     draw = ImageDraw.Draw(img)
-#     font = ImageFont.truetype(maimai_font, font_size)
+async def downloadBFile(url, fullFileName, progressCallback):
+    """
+        下载视频文件和音频文件
+    :param url:
+    :param fullFileName:
+    :param progressCallback:
+    :return:
+    """
+    async with httpx.AsyncClient() as client:
+        async with client.stream("GET", url, headers=headers) as resp:
+            currentLen = 0
+            totalLen = int(resp.headers['content-length'])
+            print(totalLen)
+            with open(fullFileName, "wb") as f:
+                async for chunk in resp.aiter_bytes():
+                    currentLen += len(chunk)
+                    f.write(chunk)
+                    progressCallback(currentLen / totalLen)
 
-#     i = 0
-#     for k, v in data.items():
-#         lentext = f"{k}{v}"
-#         while len(lentext) > 0:
-#             draw.text((10, i * (font_size + 5)), lentext[:25], font=font, fill=(0, 0, 0, 255))
-#             lentext = lentext[25:]
-#             i += 1
 
-#     return img
+def mergeFileToMp4(vFullFileName: str, aFullFileName: str, outputFileName: str, shouldDelete=True):
+    """
+        合并视频文件和音频文件
+    :param vFullFileName:
+    :param aFullFileName:
+    :param outputFileName:
+    :param shouldDelete:
+    :return:
+    """
+    # 调用ffmpeg
+    subprocess.call(f'ffmpeg -y -i "{vFullFileName}" -i "{aFullFileName}" -c copy "{outputFileName}"', shell=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    )
+    # 删除临时文件
+    if shouldDelete:
+        os.unlink(vFullFileName)
+        os.unlink(aFullFileName)
+        
+        
+def delete_boring_characters(sentence):
+    """
+        去除标题的特殊字符
+    :param sentence:
+    :return:
+    """
+    return re.sub('[0-9’!"∀〃#$%&\'()*+,-./:;<=>?@，。?★、…【】《》？“”‘’！[\\]^_`{|}~～\s]+', "", sentence)
 
-
-# async def data_to_img(msg_list: List[Dict[str, Dict[str, str]]], cell_width=1080//3, cell_height=1920//3, font_size=20) -> Image:
-#     cols = 3
-#     rows = 3
-
-#     # 创建一张1080*1920的空白图
-#     result_img = Image.new('RGBA', (cell_width * cols, cell_height * rows), color=(255, 255, 255, 255))
-
-#     # 将每个dict对象转换成包含两个dict对象的列表
-#     data_list = []
-#     for msg in msg_list:
-#         data = msg['data']
-#         url = msg['url']
-#         data_list.append((url, data))
-
-#     for i, (url, data) in enumerate(data_list):
-#         # 将图片缩放并插入到格子中
-#         image_content = await fetch_page(url['封面:'], headers={
-#             'User-Agent':
-#                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62',
-#         })
-#         image = Image.open(BytesIO(image_content))
-#         img_width, img_height = image.size
-#         ratio = min(cell_width/img_width, cell_height/img_height)
-#         new_width = int(img_width*ratio)
-#         new_height = int(img_height*ratio)
-#         image = image.resize((new_width, new_height), Image.ANTIALIAS)
-#         img_x = ((i % cols) * cell_width) + ((cell_width - new_width) // 2)
-#         img_y = ((i // cols) * cell_height) + ((cell_height - new_height-200) // 2)
-#         result_img.paste(image, (img_x, img_y))
- 
-
-#         # 添加文字信息到下方
-#         dict_img = await make_dict_img(data, cell_width, cell_height, font_size)
-#         dict_x = ((i % cols) * cell_width) + ((cell_width - dict_img.size[0]) // 2)
-#         dict_y = ((i // cols) * cell_height) + new_height + ((cell_height - new_height - font_size - dict_img.size[1]) // 2) + new_height*1
-#         result_img.paste(dict_img, (dict_x, dict_y))
-
-#     return result_img
-
+async def b_to_url(url:str,matcher:Matcher):
+     # 获取视频信息
+    base_video_info = "http://api.bilibili.com/x/web-interface/view"
+    video_id = re.search(r"video\/[^\?\/ ]+", url)[0].split('/')[1]
+    # logger.info(video_id)
+    video_title = httpx.get(
+        f"{base_video_info}?bvid={video_id}" if video_id.startswith(
+            "BV") else f"{base_video_info}?aid={video_id}").json()[
+        'data']['title']
+    video_title = delete_boring_characters(video_title)
+    # video_title = re.sub(r'[\\/:*?"<>|]', "", video_title)
+    # 获取下载链接
+    video_url, audio_url = getDownloadUrl(url)
+    # 下载视频和音频
+    path = video_title
+    await asyncio.gather(
+        downloadBFile(video_url, f"{video_title}-video.m4s", logger.info),
+        downloadBFile(audio_url, f"{video_title}-audio.m4s", logger.info))
+    mergeFileToMp4(f"{video_title}-video.m4s", f"{video_title}-audio.m4s", f"{path}-res.mp4")
+    # logger.info(os.getcwd())
+    # 发送出去
+    # logger.info(path)
+    await matcher.send(MessageSegment.video(f'{path}-res.mp4'))
+    # logger.info(f'{path}-res.mp4')
+    # 清理文件
+    os.unlink(f"{video_title}-res.mp4")
+    os.unlink(f"{video_title}-res.mp4.jpg")
