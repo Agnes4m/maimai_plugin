@@ -1,8 +1,8 @@
+
 from nonebot import require
-require('nonebot_plugin_txt2img')
 from nonebot import on_command, on_regex,get_driver
 from nonebot.params import CommandArg, EventMessage
-from nonebot.adapters import Event
+from gsuid_core import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.plugin import PluginMetadata
 
