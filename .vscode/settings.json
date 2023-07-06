@@ -14,16 +14,20 @@
       "source.organizeImports": true
     }
   },
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/../../../../"
+  ],
   "isort.args": [
     "--profile",
     "black"
   ],
   "python.formatting.provider": "black",
-  "python.linting.flake8Enabled": true,
-  "python.linting.flake8CategorySeverity.W": "Warning",
-  "python.linting.flake8CategorySeverity.F": "Warning",
-  "python.linting.flake8CategorySeverity.E": "Warning",
+  // "python.linting.flake8Enabled": true,
+  // "python.linting.flake8CategorySeverity.W": "Warning",
+  // "python.linting.flake8CategorySeverity.F": "Warning",
+  // "python.linting.flake8CategorySeverity.E": "Warning",
   "python.analysis.extraPaths": [
     "${workspaceFolder}/../../../../"
-  ]
+  ],
+  "json.schemas": []
 }
