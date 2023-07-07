@@ -6,9 +6,9 @@
     "genshin",
     "genshinuid"
   ],
+  "python.linting.pylintEnabled": true,
   "editor.formatOnSave": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": true

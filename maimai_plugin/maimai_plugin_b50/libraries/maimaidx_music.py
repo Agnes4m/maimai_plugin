@@ -5,8 +5,8 @@ from copy import deepcopy
 
 import aiohttp,asyncio
 
-def get_cover_len5_id(mid) -> str:
-    mid = int(mid)
+def get_cover_len5_id(mid: Union[str, int]) -> str:
+    mid = int(mid) 
     if mid > 10000 and mid <= 11000:
         mid -= 10000
     return f'{mid:05d}'
@@ -132,10 +132,11 @@ class MusicList(List[Music]):
         for music in self:
             diff2 = diff
             music = deepcopy(music)
-            ret, diff2 = cross(music.level, level, diff2)
+            if 
+            ret, diff2 = cross(music.level, level, diff2) # type: ignore
             if not ret:
                 continue
-            ret, diff2 = cross(music.ds, ds, diff2)
+            ret, diff2 = cross(music.ds, ds, diff2) # type: ignore
             if not ret:
                 continue
             if not in_or_equal(music.genre, genre):
@@ -144,26 +145,30 @@ class MusicList(List[Music]):
                 continue
             if not in_or_equal(music.bpm, bpm):
                 continue
-            if title_search is not Ellipsis and title_search.lower() not in music.title.lower():
+            if title_search is not Ellipsis and title_search and music.title and title_search.lower() not in music.title.lower():
                 continue
             music.diff = diff2
             new_list.append(music)
         return new_list
 
 
+
 async def main():
-    global obj,total_list
+    global obj, total_list
+
     async def fetch_json(url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 return await response.json()
 
-    obj = await fetch_json('https://www.diving-fish.com/api/maimaidxprober/music_data')
+    obj = await fetch_json("https://www.diving-fish.com/api/maimaidxprober/music_data")
     total_list = MusicList(obj)
     for __i in range(len(total_list)):
-        total_list[__i] = Music(total_list[__i])
-        for __j in range(len(total_list[__i].charts)):
-            total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
-    
-asyncio.run(main())
+        charts = total_list[__i].charts
+        if charts:
+            total_list[__i] = Music(total_list[__i])
+            for __j in range(len(total_list[__i].charts)):  # type: ignore
+                charts[__j] = Chart(charts)
+    return total_list
+# asyncio.run(main())
 
