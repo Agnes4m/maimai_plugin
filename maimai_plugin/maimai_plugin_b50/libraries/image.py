@@ -44,7 +44,10 @@ def text_to_image(text: str):
     for j in range(len(text_list)):
         text = text_list[j]
         draw.text(
-            (padding, padding + j * (margin + h)), text, font=font, fill=(0, 0, 0)
+            (padding, padding + j * (margin + h)),
+            text,
+            font=font,
+            fill=(0, 0, 0),
         )
     return i
 
@@ -62,3 +65,7 @@ def url_to_base64(url: str):
     image_data = response.content
     base64_data = base64.b64encode(image_data)
     return base64_data
+
+
+def url_to_bytes(url: str):
+    return httpx.get(url).content

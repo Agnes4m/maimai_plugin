@@ -2,20 +2,29 @@ import re
 import json
 import asyncio
 import aiohttp
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 from gsuid_core.sv import SV
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
-from gsuid_core.models import Event, MessageReceive
+from gsuid_core.models import Event
 from gsuid_core.models import Message as Messages
-from gsuid_core.gss import gss
+from gsuid_core.segment import MessageSegment
 
 from .public import *
-from .libraries.image import draw_text, text_to_image, image_to_base64, url_to_base64
+
+try:
+    from .libraries.image import (
+        text_to_image,
+        image_to_base64,
+        url_to_base64,
+        url_to_bytes,
+    )
+except Exception as E:
+    logger.warning(E)
 from .libraries.tool import hash, check_mai
 
-from .libraries.maimaidx_music import get_cover_len5_id, total_list
+from .libraries.maimaidx_music import get_cover_len5_id, total_list, Music
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
 
@@ -30,45 +39,19 @@ sv = SV(
 )
 
 
-# def song_txt(music: Music):
-#     return Message([
-#         MessageSegment("text", {
-#             "text": f"{music.id}. {music.title}\n"
-#         }),
-#         MessageSegment("image", {
-#             "file": f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"
-#         }),
-#         MessageSegment("text", {
-#             "text": f"\n{'/'.join(music.level)}"
-#         })
-#     ])
-
-
-def song_txt(music) -> Messages:
-    if music.level:
-        return (
-            Messages(
-                "text",
-                f"{music.id}. {music.title}\n",
-            )
-            + Messages(
-                "image",
-                url_to_base64(
-                    f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"
-                ),
-            )
-            + Messages("text", f"\n{'/'.join(music.level)}")
-        )
-    else:
-        return Messages(
+def song_txt(music: Music) -> List[Messages]:
+    return [
+        Messages(
             "text",
             f"{music.id}. {music.title}\n",
-        ) + Messages(
-            "image",
-            url_to_base64(
-                f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"
+        ),
+        MessageSegment.image(
+            url_to_bytes(
+                f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"  # type: ignore
             ),
-        )
+        ),
+        Messages("text", f"\n{'/'.join(music.level)}"),  # type: ignore
+    ]
 
 
 def inner_level_q(ds1: float, ds2: Optional[float] = None):
@@ -93,8 +76,8 @@ def inner_level_q(ds1: float, ds2: Optional[float] = None):
 
 
 @sv.on_command(("inner_level", "定数查歌"))
-async def inner_level(event: Event, bot: Bot):
-    argv = Event.text
+async def inner_level(bot: Bot, event: Event):
+    argv = event.text.split(' ')
     if len(argv) > 2 or len(argv) == 0:
         await bot.send("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
         return
@@ -112,7 +95,7 @@ async def inner_level(event: Event, bot: Bot):
 
 
 @sv.on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
-async def spec_rand(event: Event, bot: Bot):
+async def spec_rand(bot: Bot, event: Event):
     message = event.raw_text
     regex = r"随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
     res = re.match(regex, str(message).lower())
@@ -147,7 +130,7 @@ async def mr(bot: Bot):
 
 
 @sv.on_regex(r"^查歌.+")
-async def search_music(event: Event, bot: Bot):
+async def search_music(bot: Bot, event: Event):
     regex = "查歌(.+)"
     message = event.raw_text
     name = re.match(regex, str(message))
@@ -168,7 +151,7 @@ async def search_music(event: Event, bot: Bot):
 
 
 @sv.on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
-async def query_chart(event: Event, bot: Bot):
+async def query_chart(bot: Bot, event: Event):
     regex = "([绿黄红紫白]?)id([0-9]+)"
     message = event.raw_text
     groups = re.match(regex, str(message))
@@ -253,8 +236,8 @@ wm_list = [
 
 
 @sv.on_fullmatch(("今日舞萌", "今日mai"))
-async def jrwm(event: Event, bot: Bot):
-    qq = int(event.get_user_id())
+async def jrwm(bot: Bot, event: Event):
+    qq = int(event.user_id)
     h = hash(qq)
     rp = h % 100
     wm_value = []
@@ -270,11 +253,11 @@ async def jrwm(event: Event, bot: Bot):
     s += "mai-bot提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
 
-    await bot.send(Messages("text", s) + (song_txt(music)))
+    await bot.send([Messages("text", s)] + (song_txt(music)))
 
 
 @sv.on_command("分数线")
-async def query_score(event: Event, bot: Bot):
+async def query_score(bot: Bot, event: Event):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     message = event.raw_text
     argv = str(message).strip().split(" ")
@@ -319,10 +302,16 @@ BREAK\t5/12.5/25(外加200落)"""
                 tap = int(chart["notes"][0])
                 slide = int(chart["notes"][2])
                 hold = int(chart["notes"][1])
-                touch = int(chart["notes"][3]) if len(chart["notes"]) == 5 else 0
+                touch = (
+                    int(chart["notes"][3]) if len(chart["notes"]) == 5 else 0
+                )
                 brk = int(chart["notes"][-1])
                 total_score = (
-                    500 * tap + slide * 1500 + hold * 1000 + touch * 500 + brk * 2500
+                    500 * tap
+                    + slide * 1500
+                    + hold * 1000
+                    + touch * 500
+                    + brk * 2500
                 )
                 break_bonus = 0.01 / brk
                 break_50_reduce = total_score * break_bonus / 4
@@ -339,7 +328,7 @@ BREAK\t5/12.5/25(外加200落)"""
 
 
 @sv.on_command("b40")
-async def best_40_pic(event: Event, bot: Bot):
+async def best_40_pic(bot: Bot, event: Event):
     payload = at_to_usrid(event, "b40")
     img, success = await generate(payload)
     if success == 400 or not img:
@@ -348,12 +337,15 @@ async def best_40_pic(event: Event, bot: Bot):
         await bot.send("该用户禁止了其他人获取数据。")
     else:
         await bot.send(
-            Messages("image", f"base64://{str(image_to_base64(img), encoding='utf-8')}")
+            Messages(
+                "image",
+                f"base64://{str(image_to_base64(img), encoding='utf-8')}",
+            )
         )
 
 
 @sv.on_command("b50")
-async def best_50_pic(event: Event, bot: Bot):
+async def best_50_pic(bot: Bot, event: Event):
     payload = at_to_usrid(event)
     img, success = await generate50(payload)
     if success == 400 or not img:
@@ -362,7 +354,10 @@ async def best_50_pic(event: Event, bot: Bot):
         await bot.send("该用户禁止了其他人获取数据。")
     else:
         await bot.send(
-            Messages("image", f"base64://{str(image_to_base64(img), encoding='utf-8')}")
+            Messages(
+                "image",
+                f"base64://{str(image_to_base64(img), encoding='utf-8')}",
+            )
         )
 
 
@@ -377,7 +372,7 @@ def at_to_usrid(event: Event, b: str = "b50"):
 
 
 @sv.on_command(("help", "舞萌帮助", "mai帮助"), block=True)
-async def help(bot: Bot):
+async def help(bot: Bot, event: Event):
     help_str: str = """可用命令如下：
 今日舞萌 查看今天的舞萌运势
 XXXmaimaiXXX什么 随机一首歌
@@ -388,7 +383,7 @@ XXXmaimaiXXX什么 随机一首歌
 定数查歌 <定数>  查询定数对应的乐曲
 定数查歌 <定数下限> <定数上限>
 分数线 <难度+歌曲id> <分数线> 详情请输入“分数线 帮助”查看
-搜<手元><理论><谱面确认>"""
+检查mai资源"""
     await bot.send(
         Messages(
             "image",
@@ -398,6 +393,14 @@ XXXmaimaiXXX什么 随机一首歌
 
 
 @sv.on_fullmatch("检查mai资源")
-async def check_mai_data():
+async def check_mai_data(bot: Bot, event: Event):
+    await bot.send('正在尝试下载，大概需要2-3分钟')
     logger.info("开始检查资源")
-    await check_mai()
+    await bot.send(await check_mai())
+
+
+@sv.on_fullmatch("强制检查mai资源")
+async def force_check_mai_data(bot: Bot, event: Event):
+    await bot.send('正在尝试下载，大概需要2-3分钟')
+    logger.info("开始检查资源")
+    await bot.send(await check_mai(force=True))

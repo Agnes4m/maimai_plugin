@@ -1,15 +1,17 @@
-
 import random
+import httpx
 from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
 
-import aiohttp,asyncio
+import aiohttp, asyncio
+
 
 def get_cover_len5_id(mid: Union[str, int]) -> str:
-    mid = int(mid) 
+    mid = int(mid)
     if mid > 10000 and mid <= 11000:
         mid -= 10000
     return f'{mid:05d}'
+
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
@@ -17,7 +19,7 @@ def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     if not elem or elem is Ellipsis:
         return True, diff
     if isinstance(elem, List):
-        for _j in (range(len(checker)) if diff is Ellipsis else diff):
+        for _j in range(len(checker)) if diff is Ellipsis else diff:
             if _j >= len(checker):
                 continue
             __e = checker[_j]
@@ -25,7 +27,7 @@ def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
                 diff_ret.append(_j)
                 ret = True
     elif isinstance(elem, Tuple):
-        for _j in (range(len(checker)) if diff is Ellipsis else diff):
+        for _j in range(len(checker)) if diff is Ellipsis else diff:
             if _j >= len(checker):
                 continue
             __e = checker[_j]
@@ -33,7 +35,7 @@ def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
                 diff_ret.append(_j)
                 ret = True
     else:
-        for _j in (range(len(checker)) if diff is Ellipsis else diff):
+        for _j in range(len(checker)) if diff is Ellipsis else diff:
             if _j >= len(checker):
                 continue
             __e = checker[_j]
@@ -118,25 +120,25 @@ class MusicList(List[Music]):
     def random(self):
         return random.choice(self)
 
-    def filter(self,
-               *,
-               level: Optional[Union[str, List[str]]] = ...,
-               ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               title_search: Optional[str] = ...,
-               genre: Optional[Union[str, List[str]]] = ...,
-               bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               type: Optional[Union[str, List[str]]] = ...,
-               diff: List[int] = ...,
-               ):
+    def filter(
+        self,
+        *,
+        level: Optional[Union[str, List[str]]] = ...,
+        ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+        title_search: Optional[str] = ...,
+        genre: Optional[Union[str, List[str]]] = ...,
+        bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+        type: Optional[Union[str, List[str]]] = ...,
+        diff: List[int] = ...,
+    ):
         new_list = MusicList()
         for music in self:
             diff2 = diff
             music = deepcopy(music)
-            if 
-            ret, diff2 = cross(music.level, level, diff2) # type: ignore
+            ret, diff2 = cross(music.level, level, diff2)  # type: ignore
             if not ret:
                 continue
-            ret, diff2 = cross(music.ds, ds, diff2) # type: ignore
+            ret, diff2 = cross(music.ds, ds, diff2)  # type: ignore
             if not ret:
                 continue
             if not in_or_equal(music.genre, genre):
@@ -145,30 +147,22 @@ class MusicList(List[Music]):
                 continue
             if not in_or_equal(music.bpm, bpm):
                 continue
-            if title_search is not Ellipsis and title_search and music.title and title_search.lower() not in music.title.lower():
+            if (
+                title_search is not Ellipsis
+                and title_search.lower() not in music.title.lower()  # type: ignore
+            ):
                 continue
             music.diff = diff2
             new_list.append(music)
         return new_list
 
 
-
-async def main():
-    global obj, total_list
-
-    async def fetch_json(url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                return await response.json()
-
-    obj = await fetch_json("https://www.diving-fish.com/api/maimaidxprober/music_data")
-    total_list = MusicList(obj)
-    for __i in range(len(total_list)):
-        charts = total_list[__i].charts
-        if charts:
-            total_list[__i] = Music(total_list[__i])
-            for __j in range(len(total_list[__i].charts)):  # type: ignore
-                charts[__j] = Chart(charts)
-    return total_list
-# asyncio.run(main())
-
+obj = httpx.get(
+    'https://www.diving-fish.com/api/maimaidxprober/music_data'
+).json()
+total_list: MusicList = MusicList(obj)
+for __i in range(len(total_list)):
+    if Music(total_list[__i]):
+        total_list[__i] = Music(total_list[__i])
+        for __j in range(len(total_list[__i].charts)):  # type: ignore
+            total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])  # type: ignore

@@ -130,7 +130,9 @@ class DrawBest(object):
         self.rankRating = self.playerRating - self.musicRating
         self.pic_dir = STATIC + "/mai/pic/"
         self.cover_dir = STATIC + "/mai/cover/"
-        self.img = Image.open(self.pic_dir + "UI_TTR_BG_Base_Plus.png").convert("RGBA")
+        self.img = Image.open(
+            self.pic_dir + "UI_TTR_BG_Base_Plus.png"
+        ).convert("RGBA")
         self.ROWS_IMG = [2]
         for i in range(6):
             self.ROWS_IMG.append(116 + 96 * i)
@@ -251,9 +253,9 @@ class DrawBest(object):
         while theRa:
             digit = theRa % 10
             theRa = theRa // 10
-            digitImg = Image.open(self.pic_dir + f"UI_NUM_Drating_{digit}.png").convert(
-                "RGBA"
-            )
+            digitImg = Image.open(
+                self.pic_dir + f"UI_NUM_Drating_{digit}.png"
+            ).convert("RGBA")
             digitImg = self._resizePic(digitImg, 0.6)
             ratingBaseImg.paste(
                 digitImg, (COLOUMS_RATING[i] - 2, 9), mask=digitImg.split()[3]
@@ -261,7 +263,9 @@ class DrawBest(object):
             i = i - 1
         return ratingBaseImg
 
-    def _drawBestList(self, img: Image.Image, sdBest: BestList, dxBest: BestList):
+    def _drawBestList(
+        self, img: Image.Image, sdBest: BestList, dxBest: BestList
+    ):
         itemW = 164
         itemH = 88
         Color = [
@@ -280,7 +284,9 @@ class DrawBest(object):
             i = num // 5
             j = num % 5
             chartInfo = sdBest[num]
-            pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
+            pngPath = (
+                self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
+            )
             if not os.path.exists(pngPath):
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
@@ -298,7 +304,9 @@ class DrawBest(object):
             tempDraw.text((8, 8), title, "white", font)
             font = ImageFont.truetype(titleFontName, 14, encoding="utf-8")
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font)
+            tempDraw.text(
+                (7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font
+            )
             rankImg = Image.open(
                 self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png"
             ).convert("RGBA")
@@ -315,7 +323,10 @@ class DrawBest(object):
                 STATIC + "/adobe_simhei.otf", 12, encoding="utf-8"
             )
             tempDraw.text(
-                (8, 44), f"Base: {chartInfo.ds} -> {chartInfo.ra}", "white", font
+                (8, 44),
+                f"Base: {chartInfo.ds} -> {chartInfo.ra}",
+                "white",
+                font,
             )
             font = ImageFont.truetype(
                 STATIC + "/adobe_simhei.otf", 18, encoding="utf-8"
@@ -324,8 +335,12 @@ class DrawBest(object):
 
             recBase = Image.new("RGBA", (itemW, itemH), "black")
             recBase = recBase.point(lambda p: int(p * 0.8))
-            img.paste(recBase, (self.COLOUMS_IMG[j] + 5, self.ROWS_IMG[i + 1] + 5))
-            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
+            img.paste(
+                recBase, (self.COLOUMS_IMG[j] + 5, self.ROWS_IMG[i + 1] + 5)
+            )
+            img.paste(
+                temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4)
+            )
         for num in range(len(sdBest), sdBest.size):
             i = num // 5
             j = num % 5
@@ -333,12 +348,16 @@ class DrawBest(object):
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))  # type: ignore
             temp = temp.filter(ImageFilter.GaussianBlur(1))
-            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
+            img.paste(
+                temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4)
+            )
         for num in range(0, len(dxBest)):
             i = num // 3
             j = num % 3
             chartInfo = dxBest[num]
-            pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
+            pngPath = (
+                self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
+            )
             if not os.path.exists(pngPath):
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
@@ -356,7 +375,9 @@ class DrawBest(object):
             tempDraw.text((8, 8), title, "white", font)
             font = ImageFont.truetype(titleFontName, 14, encoding="utf-8")
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font)
+            tempDraw.text(
+                (7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font
+            )
             rankImg = Image.open(
                 self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png"
             ).convert("RGBA")
@@ -373,7 +394,10 @@ class DrawBest(object):
                 STATIC + "/adobe_simhei.otf", 12, encoding="utf-8"
             )
             tempDraw.text(
-                (8, 44), f"Base: {chartInfo.ds} -> {chartInfo.ra}", "white", font
+                (8, 44),
+                f"Base: {chartInfo.ds} -> {chartInfo.ra}",
+                "white",
+                font,
             )
             font = ImageFont.truetype(
                 STATIC + "/adobe_simhei.otf", 18, encoding="utf-8"
@@ -382,8 +406,13 @@ class DrawBest(object):
 
             recBase = Image.new("RGBA", (itemW, itemH), "black")
             recBase = recBase.point(lambda p: int(p * 0.8))
-            img.paste(recBase, (self.COLOUMS_IMG[j + 6] + 5, self.ROWS_IMG[i + 1] + 5))
-            img.paste(temp, (self.COLOUMS_IMG[j + 6] + 4, self.ROWS_IMG[i + 1] + 4))
+            img.paste(
+                recBase,
+                (self.COLOUMS_IMG[j + 6] + 5, self.ROWS_IMG[i + 1] + 5),
+            )
+            img.paste(
+                temp, (self.COLOUMS_IMG[j + 6] + 4, self.ROWS_IMG[i + 1] + 4)
+            )
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
@@ -391,7 +420,9 @@ class DrawBest(object):
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))  # type: ignore
             temp = temp.filter(ImageFilter.GaussianBlur(1))
-            img.paste(temp, (self.COLOUMS_IMG[j + 6] + 4, self.ROWS_IMG[i + 1] + 4))
+            img.paste(
+                temp, (self.COLOUMS_IMG[j + 6] + 4, self.ROWS_IMG[i + 1] + 4)
+            )
 
     def draw(self):
         splashLogo = Image.open(
@@ -400,37 +431,58 @@ class DrawBest(object):
         splashLogo = self._resizePic(splashLogo, 0.65)
         self.img.paste(splashLogo, (10, 10), mask=splashLogo.split()[3])
 
-        ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert("RGBA")
+        ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert(
+            "RGBA"
+        )
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.85)
         self.img.paste(ratingBaseImg, (240, 8), mask=ratingBaseImg.split()[3])
 
-        namePlateImg = Image.open(self.pic_dir + "UI_TST_PlateMask.png").convert("RGBA")
+        namePlateImg = Image.open(
+            self.pic_dir + "UI_TST_PlateMask.png"
+        ).convert("RGBA")
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
         font1 = ImageFont.truetype(STATIC + "/msyh.ttc", 28, encoding="unic")
-        namePlateDraw.text((12, 4), " ".join(list(self.userName)), "black", font1)
-        nameDxImg = Image.open(self.pic_dir + "UI_CMN_Name_DX.png").convert("RGBA")
+        namePlateDraw.text(
+            (12, 4), " ".join(list(self.userName)), "black", font1
+        )
+        nameDxImg = Image.open(self.pic_dir + "UI_CMN_Name_DX.png").convert(
+            "RGBA"
+        )
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (230, 4), mask=nameDxImg.split()[3])
         self.img.paste(namePlateImg, (240, 40), mask=namePlateImg.split()[3])
 
-        shougouImg = Image.open(self.pic_dir + "UI_CMN_Shougou_Rainbow.png").convert(
-            "RGBA"
-        )
+        shougouImg = Image.open(
+            self.pic_dir + "UI_CMN_Shougou_Rainbow.png"
+        ).convert("RGBA")
         shougouDraw = ImageDraw.Draw(shougouImg)
-        font2 = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 14, encoding="utf-8")
+        font2 = ImageFont.truetype(
+            STATIC + "/adobe_simhei.otf", 14, encoding="utf-8"
+        )
         playCountInfo = f"底分: {self.musicRating} + 段位分: {self.rankRating}"
         shougouImgW, shougouImgH = shougouImg.size
-        playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
+        playCountInfoW, playCountInfoH = shougouDraw.textsize(
+            playCountInfo, font2
+        )
         textPos = (
-            (shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2,
+            (shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0])
+            / 2,
             5,
         )
-        shougouDraw.text((textPos[0] - 1, textPos[1]), playCountInfo, "black", font2)
-        shougouDraw.text((textPos[0] + 1, textPos[1]), playCountInfo, "black", font2)
-        shougouDraw.text((textPos[0], textPos[1] - 1), playCountInfo, "black", font2)
-        shougouDraw.text((textPos[0], textPos[1] + 1), playCountInfo, "black", font2)
+        shougouDraw.text(
+            (textPos[0] - 1, textPos[1]), playCountInfo, "black", font2
+        )
+        shougouDraw.text(
+            (textPos[0] + 1, textPos[1]), playCountInfo, "black", font2
+        )
+        shougouDraw.text(
+            (textPos[0], textPos[1] - 1), playCountInfo, "black", font2
+        )
+        shougouDraw.text(
+            (textPos[0], textPos[1] + 1), playCountInfo, "black", font2
+        )
         shougouDraw.text(
             (textPos[0] - 1, textPos[1] - 1), playCountInfo, "black", font2
         )
@@ -449,19 +501,25 @@ class DrawBest(object):
 
         self._drawBestList(self.img, self.sdBest, self.dxBest)
 
-        authorBoardImg = Image.open(self.pic_dir + "UI_CMN_MiniDialog_01.png").convert(
-            "RGBA"
-        )
+        authorBoardImg = Image.open(
+            self.pic_dir + "UI_CMN_MiniDialog_01.png"
+        ).convert("RGBA")
         authorBoardImg = self._resizePic(authorBoardImg, 0.35)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
         authorBoardDraw.text(
             (31, 28), "   Generated By\nXybBot & Chiyuki", "black", font2
         )
-        self.img.paste(authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3])
+        self.img.paste(
+            authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3]
+        )
 
-        dxImg = Image.open(self.pic_dir + "UI_RSL_MBase_Parts_01.png").convert("RGBA")
+        dxImg = Image.open(self.pic_dir + "UI_RSL_MBase_Parts_01.png").convert(
+            "RGBA"
+        )
         self.img.paste(dxImg, (890, 65), mask=dxImg.split()[3])
-        sdImg = Image.open(self.pic_dir + "UI_RSL_MBase_Parts_02.png").convert("RGBA")
+        sdImg = Image.open(self.pic_dir + "UI_RSL_MBase_Parts_02.png").convert(
+            "RGBA"
+        )
         self.img.paste(sdImg, (758, 65), mask=sdImg.split()[3])
 
         # self.img.show()
@@ -502,7 +560,9 @@ def computeRa(ds: float, achievement: float) -> int:
     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 
 
-async def generate(payload: Dict) -> Tuple[Optional[Image.Image], Union[bool, int]]:
+async def generate(
+    payload: Dict,
+) -> Tuple[Optional[Image.Image], Union[bool, int]]:
     async with aiohttp.request(
         "POST",
         "https://www.diving-fish.com/api/maimaidxprober/query/player",
