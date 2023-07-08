@@ -17,12 +17,11 @@ _✨maimaiDX，gsuid_core插件版本✨_
         <img src="https://img.shields.io/badge/QQ%E7%BE%A4-424506063-orange?style=flat-square" alt="QQ Chat Group">
 </a>
     <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
-    <img src="https://img.shields.io/badge/nonebot-2.0.0-red.svg" alt="NoneBot">
 </div>
 
 ## 说明（已更新舞萌国服2023，重新下载资源）
 
-从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0
+从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配[gsuid_core](http://docs.gsuid.gbots.work)
 
 修改部分：
  - b40/b50可以艾特人查询

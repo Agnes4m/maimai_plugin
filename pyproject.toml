@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "nonebot_plugin_maimai"
+name = "maimai_plugin"
 version = "0.3.2"
-description= "Maimai DX plugin for NoneBot"
+description= ""
 authors = ["Agnes_Digital <Z735803792@163.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/Agnes4m/nonebot_plugin_maimai"
-repository = "https://github.com/Agnes4m/nonebot_plugin_maimai"
+homepage = "https://github.com/Agnes4m/maimai_plugin"
+repository = "https://github.com/Agnes4m/maimai_plugin"
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
@@ -21,11 +21,21 @@ include = [
     "LICENSE","README.md"
 ]
  
+[[tool.poetry.source]]
+name = "tencent"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+default = false
+secondary = true
+
 [tool.poetry.dependencies]
 python = "^3.8"
- 
-[tool.poetry.dev-dependencies]
- 
+httpx = ">=0.22.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+pycln = "^2.1.2"
+
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
