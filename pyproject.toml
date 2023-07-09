@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "nonebot_plugin_maimai"
-version = "0.3.2"
+version = "0.4.0"
 description= "Maimai DX plugin for NoneBot"
 authors = ["Agnes_Digital <Z735803792@163.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/Agnes4m/nonebot_plugin_maimai"
-repository = "https://github.com/Agnes4m/nonebot_plugin_maimai"
+homepage = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
+repository = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
 keywords = ["maimai", "nonebot2", "plugin"]
 classifiers = [
     "License :: OSI Approved :: MIT License",
