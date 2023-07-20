@@ -10,7 +10,7 @@ name: Upload Python Package
 
 on:
   push:
-    branches: [ main ]
+    branches: [ nonebot2.0.0 ]
 
 permissions:
   contents: read
