@@ -7,6 +7,7 @@
 <div align="center">
 
 # nonebot_plugin_maimai
+
 _✨maimaiDX，nonebot2插件版本✨_
 
 <a href="https://github.com/Umamusume-Agnes-Digital/nonebot_plugin_maimai/stargazers">
@@ -27,10 +28,12 @@ _✨maimaiDX，nonebot2插件版本✨_
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0
 
 修改部分：
- - b40/b50可以艾特人查询
- - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
- - （可循）env设置 `maimai_font`,是str对象的`字体`
- - 新增指令`搜手元`,`搜理论`,`搜谱面确认`，后面带上搜索的对象
+
+- b40/b50可以艾特人查询
+- static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
+- （可循）env设置 `maimai_font`,是str对象的`字体`
+- 新增指令`搜手元`,`搜理论`,`搜谱面确认`，后面带上搜索的对象
+- 新增指令检查mai资源可以初始化下载，或者强制检查mai资源强制下载覆盖
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
@@ -48,15 +51,15 @@ _✨maimaiDX，nonebot2插件版本✨_
 
 您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:(以下方法2选1)
 
- - pypi`nonebot_plugin_maimai`文件夹中 - 最终路径类似是/path/to/nonebot_plugin_maimai/static
- - 机器人目录下 - 最终路径类似是/path/to/data/maimai/static中。其中bot.py文件在/path/to位置
+- pypi`nonebot_plugin_maimai`文件夹中 - 最终路径类似是/path/to/nonebot_plugin_maimai/static
+- 机器人目录下 - 最终路径类似是/path/to/data/maimai/static中。其中bot.py文件在/path/to位置
 
 > 资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
 
 ## FAQ
 
 配置 nonebot 或 cq-http 过程中出错？
-> 请查阅 https://github.com/nonebot/nonebot2 以及 https://github.com/Mrs4s/go-cqhttp 中的文档。
+> 请查阅 <https://github.com/nonebot/nonebot2> 以及 <https://github.com/Mrs4s/go-cqhttp> 中的文档。
 
 部分消息发不出来？
 > 被风控了。解决方式：换号或者让这个号保持登陆状态和一定的聊天频率，持续一段时间。

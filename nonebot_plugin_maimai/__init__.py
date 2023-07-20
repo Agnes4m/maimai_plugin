@@ -1,6 +1,7 @@
 from nonebot import require
-from nonebot import on_command, on_regex, get_driver
+from nonebot import on_command, on_regex, get_driver,on_fullmatch
 from nonebot.params import CommandArg, EventMessage
+from nonebot.permission import SUPERUSER
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.plugin import PluginMetadata
@@ -27,49 +28,14 @@ try:
 except:
     nickname = "宁宁"
 
-logo = """ # type: ignore
-    ......                  ` .]]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OO^       
-    ......                ,/@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OO^       
-    ......            /O@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OO^       
-    `.....           ,@^=.OOO\/\@@@@@@@@@@@@@@@@@@@@OO//@@@@@/OO\]]]OO\]
-    ``....          ,@@/=^OOOOOOOO@@@@@@@@@@@\]OOOOOOO^^=@@@@OOOOOOOOOOO
-    `.....          O@O^==OOOOOOOO@@@/.,@@@OOOOOOOOOOO\O,@@@@OOOOOOOOO@@
-    ......    ,    .@@@^=`OOOOOOOOO/  ,O@@OOOOOOOOOOOOOO.O@@@OO/[[[[[[[.
-    ......    =..,//@@@^=`OOOOOOOOO@.*=@@@OOOOOOOOOOOOOO]@@@OOO.     ,/`
-    ......    =.\O]`,@O^\=OOOO@@@@@@O`=@@@@@@@OOOOOOOO*O,OO^....[[``]./]
-    ......    ,^.oOoO@O^=,OO@@@@@OoO`\O\OO@@@@OOOOOOOOO]@@^.]]]/OOOo.,OO
-    ......     =.=OOOO@@@@/[[=/.^,/....*.=^,[O@@@@OOOO.@@OOOOOOOOO/..OOO
-    ......      \.\OO`.,....*`.=.^.......=....=@O[\@@O@@[^ ,`.=Oo*.,OOO/
-    ......       ,@,`...  ....=^/......../....=/O^....\..O]/[\O[*]/OOO. 
-    ......       ]@^.,....*..=O\^........^..*.O.\O.^..=^\..,\/\@OOO[.   
-    ......    ,,`O^.,..../.,O`//........=..=`=^.=O`O..=^..OOO*/OOO.     
-    ......   .=.=@..^...=^/O`*OO.]...o**\.,/=^...O^@^..^...OO^=`OOO`    
-    ......  `=.,O^./.*.,OO`,.,/@/.*,O`,O*/@/`....\O\^......Oo^.^,OOO.   
-    ...... .,`.o=^=^.../`...]/`***/O^/@oO@`..[[[[\/=\......O^^...=OO^   
-    ......  ^.=`O^O.*.=\],]]]/\O/\@O[=O/`        =.=O....=^O^*....OOO.  
-    ...... =../=OO^.*.=@@[[,@@@\ .. ..    ,\@@@@@] =O...`=^@`.....=OO^  
-    ...... `..^=OO^.^,@`  ^ =oO\          .O\O@\.,\@@..,^OoO......=OOO. 
-    ...... ^...=OO^.^.@^ =^*=^,O          \..Ooo^  ,@..=OOOO..*....OOO. 
-    ...... ^...=o@^.`.O@. .  ... .. ....  ^.*`.*^  =^..o@oO@*.=....OOO^ 
-    ...... ^...=oOO.*.\O   ... .......... .\   ` ,=^*.,OOOO@^.=`^..=OO\ 
-    ...... ^...*`OO.*.=O ........          ......,`*^.=OOOo@^.=^^..=OOO.
-    ...... \....*oO^..*O^ ....... @OO[[[`  ......../.,@OOOo@^..OO...OOO`
-    ...... =.....*.=`..,O`       .O.....=   ... ^.=..OOOOO=O@..=O^..OOO^
-    ...... .^...**.O@...\O^ .     \.....`   .^ /.,^.=O@OO`=O@^..OO`.=OO\
-    ...... .^...,.=O=@...OO@\      ,[O\=.    ./`.*.*OOOOO..OOO*..OO.,OOO
-    ....../O....../^=O@`..O@@@@@]`    .* .,/@@/..../OOOOO*.,OOO..,OO`=OO
-    @OO\ooO....,*/@^,@@@\..@^[\@@@@@@O]*]//[`@^*^*=OOOOOO^..=OO\...\^.\@
-    OOooo^..`./oOO@/ =^\/^.^\\....=]......,/@@^O^*O.... .,][],OO\....\`.
-    @Oooo\/]OOOOOO/  .  \.=^....,..........[.,OO^=^.    /    ,`\OO`.....
-    """  # type: ignore
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
-    description="指令：舞萌帮助",
-    usage=logo,
+    description="适用nonebot2的Maimai插件",
+    usage="指令：舞萌帮助",
     type="application",
-    homepage="https://github.com/Agnes4m/nonebot_plugin_maimai",
+    homepage="https://github.com/Agnes4m/maimai_plugin",
     supported_adapters={"~onebot.v11"},
     extra={
         "version": __version__,
@@ -340,7 +306,7 @@ BREAK\t5/12.5/25(外加200落)"""
             music = total_list.by_id(chart_id)
             if not music:
                 return
-            chart: Dict[Any] = music["charts"][level_index]
+            chart: Dict[str,Any] = music["charts"][level_index]
             tap = int(chart["notes"][0])
             slide = int(chart["notes"][2])
             hold = int(chart["notes"][1])
@@ -456,3 +422,19 @@ def at_to_usrid(ats: List[str]):
         return usr_id
     else:
         return None
+
+check_mai_data = on_fullmatch("检查mai资源",permission=SUPERUSER)
+force_check_mai_data = on_fullmatch("强制检查mai资源",permission=SUPERUSER)
+
+@check_mai_data.handle()
+async def _(event: Event):
+    await check_mai_data.send('正在尝试下载，大概需要2-3分钟')
+    logger.info("开始检查资源")
+    await check_mai_data.send(await check_mai())
+
+
+@force_check_mai_data.handle()
+async def _(event: Event):
+    await force_check_mai_data.send('正在尝试下载，大概需要2-3分钟')
+    logger.info("开始检查资源")
+    await force_check_mai_data.send(await check_mai(force=True))

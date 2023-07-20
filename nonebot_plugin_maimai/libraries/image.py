@@ -31,6 +31,7 @@ def text_to_image(text):
     margin = 4
     text_list = text.split("\n")
     max_width = 0
+    h = 0
     for text in text_list:
         w, h = font.getsize(text)
         max_width = max(max_width, w)
