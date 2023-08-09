@@ -1,55 +1,63 @@
-from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
+import asyncio
+import json
+import os
+import random
+import re
+import subprocess
+import zipfile
+from pathlib import Path
+from typing import Dict, List, Set, Union
+
+import aiohttp
+import httpx
+from bs4 import BeautifulSoup
+from nonebot import get_driver, on_command
+from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.exception import IgnoredException
-from nonebot.message import event_preprocessor
-from nonebot_plugin_txt2img import Txt2Img
 from nonebot.log import logger
-from nonebot import get_driver
-from nonebot.params import CommandArg, RawCommand
 from nonebot.matcher import Matcher
+from nonebot.message import event_preprocessor
+from nonebot.params import CommandArg, RawCommand
+from nonebot_plugin_txt2img import Txt2Img
+from pydantic import BaseModel, Extra
+
 from .libraries.image import *
 
-from bs4 import BeautifulSoup
-from pathlib import Path
-from typing import Dict, List
-import aiohttp
-import os
-import json
-import random
-import subprocess
-import httpx
-import re
-import asyncio
-import zipfile
 
-try:
-    maimai_font: str = get_driver().config.maimai_font
-except:
+class Config(BaseModel):
+    """基本配置"""
+
+    bot_nickname: str = "宁宁"
     maimai_font: str = "simsun.ttc"
-try:
-    b_cookie: str = get_driver().config.b_cookie
-except:
+    master_id: Union[List[str], Set[str]] = get_driver().config.superusers
     b_cookie: str = "b_nut=1649576401; buvid3=1E315685-39D7-CED8-F3F1-243C09E1F2E402464infoc; i-wanna-go-back=-1; buvid_fp_plain=undefined; CURRENT_BLACKGAP=0; LIVE_BUVID=AUTO8116495836832058; blackside_state=0; PVID=1; buvid4=1978384A-7128-E8DD-7067-595341C2F6BB02464-022041015-GcxPOTfDq8w%2FtuBv55%2BLdQ%3D%3D; rpdid=|(YuRll)|~l0J'uYY)mJJRl|; CURRENT_FNVAL=4048; header_theme_version=CLOSE; fingerprint=6b47357ae6c97f2cdf90243e8c57b973; CURRENT_PID=eada9510-d0f2-11ed-b243-8b1406a7fccc; DedeUserID=60824233; DedeUserID__ckMd5=7cfd5a1f149fedcc; b_ut=5; _uuid=1E6E8C21-4FC6-8F106-EE71-4210107CEF105DF35899infoc; FEED_LIVE_VERSION=V8; nostalgia_conf=-1; bp_video_offset_60824233=792868838749241300; CURRENT_QUALITY=64; home_feed_column=5; SESSDATA=b8c82b67%2C1704203767%2Ce49ff%2A71-fAq4c-tiCsv2xLJKAbdwkmTP4VbOeQWX9DmlCZBeKungWYZDVcsCMNDVohyiVIpNtJ4kQAAIQA; bili_jct=ac45f014bd11b174389d07077744f044; buvid_fp=a275cb625909c14200ae434eefcc8d94; browser_resolution=1492-771"
+
+    class Config:
+        extra = Extra.ignore
+
+
+config = Config.parse_obj(get_driver().config)
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 SE 2.X MetaSr 1.0",
-    "cookie": b_cookie,
+    "cookie": config.b_cookie,
 }
 
 
-@event_preprocessor
-async def preprocessor(bot, event, state):
-    if (
-        hasattr(event, "message_type")
-        and event.message_type == "private"
-        and event.sub_type != "friend"
-    ):
-        raise IgnoredException("not reply group temp message")
+# @event_preprocessor
+# async def preprocessor(bot: Bot, event:Event, state):
+#     if (
+#         hasattr(event, "message_type")
+#         and event.message_type == "private"
+#         and event.sub_type != "friend"
+#     ):
+#         raise IgnoredException("not reply group temp message")
 
 
-help = on_command("help", aliases={"舞萌帮助", "mai帮助"})
+help_msg = on_command("help", aliases={"舞萌帮助", "mai帮助"})
 
 
-@help.handle()
+@help_msg.handle()
 async def _():
     help_str = """可用命令如下：
 今日舞萌 查看今天的舞萌运势
@@ -73,7 +81,7 @@ XXXmaimaiXXX什么 随机一首歌
     pic = txt2img.draw(title, help_str)
     try:
         await help.send(MessageSegment.image(pic))
-    except:
+    except Exception:
         await help.send(help_str)
 
 
@@ -124,13 +132,12 @@ async def fetch_page(url):
 
 
 async def get_target(keyword: str):
-
-    mainUrl = "https://search.bilibili.com/all?keyword=" + keyword
-    content = await fetch_page(mainUrl)
-    mainSoup = BeautifulSoup(content, "html.parser")
+    mainurl = "https://search.bilibili.com/all?keyword=" + keyword
+    content = await fetch_page(mainurl)
+    mainsoup = BeautifulSoup(content, "html.parser")
     viedoNum = 1
     msg_list: List[Dict[str, Dict[str, str]]] = []
-    for item in mainSoup.find_all("div", class_="bili-video-card"):
+    for item in mainsoup.find_all("div", class_="bili-video-card"):
         item: BeautifulSoup
         msg: Dict[str, Dict[str, str]] = {"data": {}, "url": {}}
         # try:
@@ -287,6 +294,7 @@ async def b_to_url(url: str, matcher: Matcher, video_title: str):
     os.unlink(f"{video_title}-res.mp4")
     os.unlink(f"{video_title}-res.mp4.jpg")
 
+
 async def check_mai(force: bool = False):
     """检查mai资源"""
     if not Path(STATIC).joinpath("mai/pic").exists() or force:
@@ -297,15 +305,15 @@ async def check_mai(force: bool = False):
 
             with open("static.zip", "wb") as f:
                 f.write(static_data)
-            logger.success('已成功下载，正在尝试解压mai资源')
+            logger.success("已成功下载，正在尝试解压mai资源")
             with zipfile.ZipFile("static.zip", "r") as zip_file:
                 zip_file.extractall(Path("data/maimai"))
-            logger.success('mai资源已完整，尝试删除缓存')
+            logger.success("mai资源已完整，尝试删除缓存")
             # Path("static.zip").unlink()  # 删除下载的压缩文件
-            return 'mai资源下载成功，请使用【舞萌帮助】获取指令'
+            return "mai资源下载成功，请使用【舞萌帮助】获取指令"
         except Exception as e:
             logger.warning(f"自动下载出错\n{e}\n请自行尝试手动下载")
             return f"自动下载出错\n{e}\n请自行尝试手动下载"
     else:
-        logger.info('已经成功下载，无需下载')
-        return '已经成功下载，无需下载'
+        logger.info("已经成功下载，无需下载")
+        return "已经成功下载，无需下载"

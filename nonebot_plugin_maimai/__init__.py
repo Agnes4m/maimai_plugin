@@ -1,31 +1,30 @@
-from nonebot import require
-from nonebot import on_command, on_regex, get_driver,on_fullmatch
-from nonebot.params import CommandArg, EventMessage
-from nonebot.permission import SUPERUSER
+from nonebot import get_driver, on_command, on_fullmatch, on_regex, require
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.params import CommandArg, EventMessage
+from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
 require("nonebot_plugin_txt2img")
-from .public import *
-from .libraries.tool import hash
-from .libraries.maimaidx_music import *
+import re
+from typing import Any
+
 from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
-import re
-
-from typing import Any
+from .libraries.maimaidx_music import *
+from .libraries.tool import hash_
+from .public import *
 
 try:
     import ujson as json
-except:
+except ImportError:
     import json
 
 driver = get_driver()
 try:
     nickname = list(driver.config.nickname)[0]
-except:
+except Exception:
     nickname = "宁宁"
 
 
@@ -151,6 +150,8 @@ async def _(event: Event, message: Message = EventMessage()):
     if name == "":
         return
     res = total_list.filter(title_search=name)
+    if res is None:
+        return
     if len(res) == 0:
         await search_music.send("没有找到这样的乐曲。")
     elif len(res) < 50:
@@ -247,7 +248,7 @@ jrwm = on_command("今日舞萌", aliases={"今日mai"})
 @jrwm.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
-    h = hash(qq)
+    h = hash_(qq)
     rp = h % 100
     wm_value = []
     for i in range(11):
@@ -306,7 +307,7 @@ BREAK\t5/12.5/25(外加200落)"""
             music = total_list.by_id(chart_id)
             if not music:
                 return
-            chart: Dict[str,Any] = music["charts"][level_index]
+            chart: Dict[str, Any] = music["charts"][level_index]
             tap = int(chart["notes"][0])
             slide = int(chart["notes"][2])
             hold = int(chart["notes"][1])
@@ -423,18 +424,20 @@ def at_to_usrid(ats: List[str]):
     else:
         return None
 
-check_mai_data = on_fullmatch("检查mai资源",permission=SUPERUSER)
-force_check_mai_data = on_fullmatch("强制检查mai资源",permission=SUPERUSER)
+
+check_mai_data = on_fullmatch("检查mai资源", permission=SUPERUSER)
+force_check_mai_data = on_fullmatch("强制检查mai资源", permission=SUPERUSER)
+
 
 @check_mai_data.handle()
 async def _(event: Event):
-    await check_mai_data.send('正在尝试下载，大概需要2-3分钟')
+    await check_mai_data.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
     await check_mai_data.send(await check_mai())
 
 
 @force_check_mai_data.handle()
 async def _(event: Event):
-    await force_check_mai_data.send('正在尝试下载，大概需要2-3分钟')
+    await force_check_mai_data.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
     await force_check_mai_data.send(await check_mai(force=True))

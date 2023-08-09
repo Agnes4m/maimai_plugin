@@ -37,3 +37,60 @@ bs4 = "^0.0.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+pythonVersion = "3.8"
+
+[tool.black]
+line-length = 89
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+# skip-string-normalization = true
+
+[tool.ruff.isort]
+extra-standard-library = ["typing_extensions"]
+
+[tool.ruff]
+ignore = [
+    "B008",
+    "B905",
+    "N803:,
+    "E501",
+    "FBT002",
+    "PGH003",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "RUF006",
+    "RUF100",
+    "SIM117",
+    "TRY002",
+    "TRY003",
+]
+select = [
+    "A",
+    "ARG",
+    "ASYNC",
+    "B",
+    "C4",
+    "COM",
+    "E",
+    "F",
+    "FBT",
+    "FLY",
+    "I",
+    "ISC",
+    "N",
+    "PIE",
+    "PGH",
+    "PTH",
+    "PYI",
+    "Q",
+    "RET",
+    "RSE",
+    "RUF",
+    "SIM",
+    "SLF",
+    "SLOT",
+    "TRY",
+]

@@ -1,8 +1,9 @@
+import asyncio
 import random
-from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-import aiohttp, asyncio
+import aiohttp
 
 
 def get_cover_len5_id(mid) -> str:
@@ -134,6 +135,14 @@ class MusicList(List[Music]):
         for music in self:
             diff2 = diff
             music = deepcopy(music)
+            if not music.level:
+                return
+            if not music.ds:
+                return 
+            if not title_search:
+                return
+            if not music.title:
+                return
             ret, diff2 = cross(music.level, level, diff2)
             if not ret:
                 continue
@@ -168,7 +177,9 @@ async def main():
     total_list = MusicList(obj)
     for __i in range(len(total_list)):
         total_list[__i] = Music(total_list[__i])
-        for __j in range(len(total_list[__i].charts)):
+        if total_list[__i].charts is None:
+            return None
+        for __j in range(len(total_list[__i].charts)): # type: ignore
             total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
 
 

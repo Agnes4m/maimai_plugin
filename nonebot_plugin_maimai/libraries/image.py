@@ -1,8 +1,9 @@
 import base64
 from io import BytesIO
-from .tool import STATIC
-from PIL import ImageFont, ImageDraw, Image
 
+from PIL import Image, ImageDraw, ImageFont
+
+from .tool import STATIC
 
 path = STATIC + "/high_eq_image.png"
 fontpath = STATIC + "/msyh.ttc"
@@ -41,9 +42,7 @@ def text_to_image(text):
     draw = ImageDraw.Draw(i)
     for j in range(len(text_list)):
         text = text_list[j]
-        draw.text(
-            (padding, padding + j * (margin + h)), text, font=font, fill=(0, 0, 0)
-        )
+        draw.text((padding, padding + j * (margin + h)), text, font=font, fill=(0, 0, 0))
     return i
 
 

@@ -1,13 +1,14 @@
-import os
 import math
-from typing import Optional, Dict, List, Tuple
-from .tool import STATIC
+import os
+from typing import Dict, List, Optional, Tuple
+
 import aiohttp
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from .maimaidx_music import total_list, get_cover_len5_id
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from .maimaidx_music import get_cover_len5_id, total_list
+from .tool import STATIC
 
-scoreRank = "D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+".split(" ")
+scorerank = "D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+".split(" ")
 combo = " FC FC+ AP AP+".split(" ")
 diffs = "Basic Advanced Expert Master Re:Master".split(" ")
 
@@ -71,7 +72,7 @@ class ChartInfo(object):
         fc = ["", "fc", "fcp", "ap", "app"]
         fi = fc.index(data["fc"])
         return cls(
-            idNum=total_list.by_title(data["title"]).id,
+            idNum=total_list.by_title(data["title"]).id, # type: ignore
             title=data["title"],
             diff=data["level_index"],
             ra=data["ra"],
@@ -281,7 +282,7 @@ class DrawBest(object):
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2) # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: int(p * 0.72))
@@ -308,18 +309,14 @@ class DrawBest(object):
                 ).convert("RGBA")
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (103, 27), comboImg.split()[3])
-            font = ImageFont.truetype(
-                STATIC + "/adobe_simhei.otf", 12, encoding="utf-8"
-            )
+            font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 12, encoding="utf-8")
             tempDraw.text(
                 (8, 44),
                 f"Base: {chartInfo.ds} -> {computeRa(chartInfo.ds, chartInfo.achievement)}",
                 "white",
                 font,
             )
-            font = ImageFont.truetype(
-                STATIC + "/adobe_simhei.otf", 18, encoding="utf-8"
-            )
+            font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 18, encoding="utf-8")
             tempDraw.text((8, 60), f"#{num + 1}", "white", font)
 
             recBase = Image.new("RGBA", (itemW, itemH), "black")
@@ -332,7 +329,7 @@ class DrawBest(object):
             temp = Image.open(self.cover_dir + f"01000.png").convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2) # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(1))
             img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
@@ -346,7 +343,7 @@ class DrawBest(object):
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2) # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: int(p * 0.72))
@@ -373,15 +370,11 @@ class DrawBest(object):
                 ).convert("RGBA")
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (103, 27), comboImg.split()[3])
-            font = ImageFont.truetype(
-                STATIC + "/adobe_simhei.otf", 12, encoding="utf-8"
-            )
+            font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 12, encoding="utf-8")
             tempDraw.text(
                 (8, 44), f"Base: {chartInfo.ds} -> {chartInfo.ra}", "white", font
             )
-            font = ImageFont.truetype(
-                STATIC + "/adobe_simhei.otf", 18, encoding="utf-8"
-            )
+            font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 18, encoding="utf-8")
             tempDraw.text((8, 60), f"#{num + 1}", "white", font)
 
             recBase = Image.new("RGBA", (itemW, itemH), "black")
@@ -394,7 +387,7 @@ class DrawBest(object):
             temp = Image.open(self.cover_dir + f"01000.png").convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2) # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(1))
             img.paste(temp, (self.COLOUMS_IMG[j + 8] + 4, self.ROWS_IMG[i + 1] + 4))
@@ -439,18 +432,10 @@ class DrawBest(object):
         shougouDraw.text((textPos[0] + 1, textPos[1]), playCountInfo, "black", font2)
         shougouDraw.text((textPos[0], textPos[1] - 1), playCountInfo, "black", font2)
         shougouDraw.text((textPos[0], textPos[1] + 1), playCountInfo, "black", font2)
-        shougouDraw.text(
-            (textPos[0] - 1, textPos[1] - 1), playCountInfo, "black", font2
-        )
-        shougouDraw.text(
-            (textPos[0] + 1, textPos[1] - 1), playCountInfo, "black", font2
-        )
-        shougouDraw.text(
-            (textPos[0] - 1, textPos[1] + 1), playCountInfo, "black", font2
-        )
-        shougouDraw.text(
-            (textPos[0] + 1, textPos[1] + 1), playCountInfo, "black", font2
-        )
+        shougouDraw.text((textPos[0] - 1, textPos[1] - 1), playCountInfo, "black", font2)
+        shougouDraw.text((textPos[0] + 1, textPos[1] - 1), playCountInfo, "black", font2)
+        shougouDraw.text((textPos[0] - 1, textPos[1] + 1), playCountInfo, "black", font2)
+        shougouDraw.text((textPos[0] + 1, textPos[1] + 1), playCountInfo, "black", font2)
         shougouDraw.text(textPos, playCountInfo, "white", font2)
         shougouImg = self._resizePic(shougouImg, 1.05)
         self.img.paste(shougouImg, (240, 83), mask=shougouImg.split()[3])
@@ -510,7 +495,7 @@ def computeRa(ds: float, achievement: float) -> int:
     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 
 
-async def generate50(payload: Dict) -> Tuple[Optional[Image.Image], bool]:
+async def generate50(payload: Dict) -> Tuple[Optional[Image.Image], int]:
     async with aiohttp.request(
         "POST",
         "https://www.diving-fish.com/api/maimaidxprober/query/player",
