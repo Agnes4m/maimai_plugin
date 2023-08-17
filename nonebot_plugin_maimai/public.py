@@ -21,6 +21,7 @@ from nonebot.params import CommandArg, RawCommand
 from nonebot_plugin_txt2img import Txt2Img
 from pydantic import BaseModel, Extra
 
+from .api import update_pl
 from .libraries.image import *
 
 
@@ -297,6 +298,7 @@ async def b_to_url(url: str, matcher: Matcher, video_title: str):
 
 async def check_mai(force: bool = False):
     """检查mai资源"""
+    await update_pl() # 获取json文件
     if not Path(STATIC).joinpath("mai/pic").exists() or force:
         logger.info("初次使用，正在尝试自动下载资源\n资源包大小预计90M")
         try:
@@ -317,3 +319,4 @@ async def check_mai(force: bool = False):
     else:
         logger.info("已经成功下载，无需下载")
         return "已经成功下载，无需下载"
+    

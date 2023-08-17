@@ -9,6 +9,7 @@ require("nonebot_plugin_txt2img")
 import re
 from typing import Any
 
+from .api import bind_site, show_all
 from .libraries.image import *
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
@@ -65,7 +66,7 @@ def inner_level_q(ds1, ds2=None):
         music_data = total_list.filter(ds=(ds1, ds2))
     else:
         music_data = total_list.filter(ds=ds1)
-    for music in sorted(music_data, key=lambda i: int(i["id"])):
+    for music in sorted(music_data, key=lambda i: int(i["id"])): # type: ignore
         for i in music.diff:
             result_set.append(
                 (
@@ -122,7 +123,7 @@ async def _(event: Event, message: Message = EventMessage()):
                 music_data = total_list.filter(
                     level=level, diff=["绿黄红紫白".index(res.groups()[1])], type=tp
                 )
-            if len(music_data) == 0:
+            if len(music_data) == 0 or music_data is None:  # type: ignore
                 rand_result = "没有这样的乐曲哦。"
             else:
                 rand_result = song_txt(music_data.random())
