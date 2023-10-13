@@ -1,33 +1,31 @@
-import re
-import json
 import asyncio
-import aiohttp
-from typing import Optional, Dict, Any, List
+import json
+import re
+from typing import Any, Dict, List, Optional
 
-from gsuid_core.sv import SV
+import aiohttp
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.models import Message as Messages
 from gsuid_core.segment import MessageSegment
+from gsuid_core.sv import SV
 
 from .public import *
 
 try:
     from .libraries.image import (
-        text_to_image,
         image_to_base64,
+        text_to_image,
         url_to_base64,
         url_to_bytes,
     )
 except Exception as E:
     logger.warning(E)
-from .libraries.tool import hash, check_mai
-
-from .libraries.maimaidx_music import get_cover_len5_id, total_list, Music
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
-
+from .libraries.maimaidx_music import Music, get_cover_len5_id, total_list
+from .libraries.tool import _hash, check_mai
 
 sv = SV(
     name="基础指令",  # 定义一组服务`开关`,
@@ -77,7 +75,7 @@ def inner_level_q(ds1: float, ds2: Optional[float] = None):
 
 @sv.on_command(("inner_level", "定数查歌"))
 async def inner_level(bot: Bot, event: Event):
-    argv = event.text.split(' ')
+    argv = event.text.split(" ")
     if len(argv) > 2 or len(argv) == 0:
         await bot.send("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
         return
@@ -238,7 +236,7 @@ wm_list = [
 @sv.on_fullmatch(("今日舞萌", "今日mai"))
 async def jrwm(bot: Bot, event: Event):
     qq = int(event.user_id)
-    h = hash(qq)
+    h = _hash(qq)
     rp = h % 100
     wm_value = []
     for i in range(11):
@@ -302,16 +300,10 @@ BREAK\t5/12.5/25(外加200落)"""
                 tap = int(chart["notes"][0])
                 slide = int(chart["notes"][2])
                 hold = int(chart["notes"][1])
-                touch = (
-                    int(chart["notes"][3]) if len(chart["notes"]) == 5 else 0
-                )
+                touch = int(chart["notes"][3]) if len(chart["notes"]) == 5 else 0
                 brk = int(chart["notes"][-1])
                 total_score = (
-                    500 * tap
-                    + slide * 1500
-                    + hold * 1000
-                    + touch * 500
-                    + brk * 2500
+                    500 * tap + slide * 1500 + hold * 1000 + touch * 500 + brk * 2500
                 )
                 break_bonus = 0.01 / brk
                 break_50_reduce = total_score * break_bonus / 4
@@ -394,13 +386,13 @@ XXXmaimaiXXX什么 随机一首歌
 
 @sv.on_fullmatch("检查mai资源")
 async def check_mai_data(bot: Bot, event: Event):
-    await bot.send('正在尝试下载，大概需要2-3分钟')
+    await bot.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
     await bot.send(await check_mai())
 
 
 @sv.on_fullmatch("强制检查mai资源")
 async def force_check_mai_data(bot: Bot, event: Event):
-    await bot.send('正在尝试下载，大概需要2-3分钟')
+    await bot.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
     await bot.send(await check_mai(force=True))

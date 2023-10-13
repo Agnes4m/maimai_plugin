@@ -1,16 +1,17 @@
+import asyncio
 import random
-import httpx
-from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-import aiohttp, asyncio
+import aiohttp
+import httpx
 
 
 def get_cover_len5_id(mid: Union[str, int]) -> str:
     mid = int(mid)
     if mid > 10000 and mid <= 11000:
         mid -= 10000
-    return f'{mid:05d}'
+    return f"{mid:05d}"
 
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
@@ -64,18 +65,18 @@ class Chart(Dict):
     charter: Optional[int] = None
 
     def __getattribute__(self, item):
-        if item == 'tap':
-            return self['notes'][0]
-        elif item == 'hold':
-            return self['notes'][1]
-        elif item == 'slide':
-            return self['notes'][2]
-        elif item == 'touch':
-            return self['notes'][3] if len(self['notes']) == 5 else 0
-        elif item == 'brk':
-            return self['notes'][-1]
-        elif item == 'charter':
-            return self['charter']
+        if item == "tap":
+            return self["notes"][0]
+        elif item == "hold":
+            return self["notes"][1]
+        elif item == "slide":
+            return self["notes"][2]
+        elif item == "touch":
+            return self["notes"][3] if len(self["notes"]) == 5 else 0
+        elif item == "brk":
+            return self["notes"][-1]
+        elif item == "charter":
+            return self["charter"]
         return super().__getattribute__(item)
 
 
@@ -95,10 +96,10 @@ class Music(Dict):
     diff: List[int] = []
 
     def __getattribute__(self, item):
-        if item in {'genre', 'artist', 'release_date', 'bpm', 'version'}:
-            if item == 'version':
-                return self['basic_info']['from']
-            return self['basic_info'][item]
+        if item in {"genre", "artist", "release_date", "bpm", "version"}:
+            if item == "version":
+                return self["basic_info"]["from"]
+            return self["basic_info"][item]
         elif item in self:
             return self[item]
         return super().__getattribute__(item)
@@ -157,9 +158,7 @@ class MusicList(List[Music]):
         return new_list
 
 
-obj = httpx.get(
-    'https://www.diving-fish.com/api/maimaidxprober/music_data'
-).json()
+obj = httpx.get("https://www.diving-fish.com/api/maimaidxprober/music_data").json()
 total_list: MusicList = MusicList(obj)
 for __i in range(len(total_list)):
     if Music(total_list[__i]):

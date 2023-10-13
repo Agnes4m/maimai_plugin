@@ -1,10 +1,11 @@
 import base64
-import httpx
 from io import BytesIO
-from .tool import STATIC
-from PIL import ImageFont, ImageDraw, Image
+
+import httpx
+from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as Image_tpye
 
+from .tool import STATIC
 
 path = STATIC + "/high_eq_image.png"
 fontpath = STATIC + "/msyh.ttc"

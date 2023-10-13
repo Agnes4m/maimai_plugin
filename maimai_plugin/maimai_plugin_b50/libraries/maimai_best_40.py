@@ -1,13 +1,14 @@
 # Author: xyb, Diving_Fish
 
-import os
 import math
-from typing import Optional, Dict, List, Tuple, Union
-from .tool import STATIC
-import aiohttp
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from .maimaidx_music import get_cover_len5_id, total_list
+import os
+from typing import Dict, List, Optional, Tuple, Union
 
+import aiohttp
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+from .maimaidx_music import get_cover_len5_id, total_list
+from .tool import STATIC
 
 scoreRank = "D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+".split(" ")
 combo = " FC FC+ AP AP+".split(" ")

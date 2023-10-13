@@ -1,12 +1,13 @@
+import asyncio
 import time
-import httpx
 import zipfile
-import aiohttp, asyncio
-from typing import Union
 from pathlib import Path
+from typing import Union
+
+import aiohttp
+import httpx
 from gsuid_core.data_store import get_res_path
 from gsuid_core.logger import logger
-
 
 STATICs = get_res_path("maimai_plugin")
 STATICs.parent.mkdir(parents=True, exist_ok=True)
@@ -24,21 +25,21 @@ async def check_mai(force: bool = False):
 
             with open("static.zip", "wb") as f:
                 f.write(static_data)
-            logger.success('已成功下载，正在尝试解压mai资源')
+            logger.success("已成功下载，正在尝试解压mai资源")
             with zipfile.ZipFile("static.zip", "r") as zip_file:
                 zip_file.extractall(STATICs)
-            logger.success('mai资源已完整，尝试删除缓存')
+            logger.success("mai资源已完整，尝试删除缓存")
             # Path("static.zip").unlink()  # 删除下载的压缩文件
-            return 'mai资源下载成功，请使用【舞萌帮助】获取指令'
+            return "mai资源下载成功，请使用【舞萌帮助】获取指令"
         except Exception as e:
             logger.warning(f"自动下载出错\n{e}\n请自行尝试手动下载")
             return f"自动下载出错\n{e}\n请自行尝试手动下载"
     else:
-        logger.info('已经成功下载，无需下载')
-        return '已经成功下载，无需下载'
+        logger.info("已经成功下载，无需下载")
+        return "已经成功下载，无需下载"
 
 
-def hash(qq: int):
+def _hash(qq: int):
     days = (
         int(time.strftime("%d", time.localtime(time.time())))
         + 31 * int(time.strftime("%m", time.localtime(time.time())))
