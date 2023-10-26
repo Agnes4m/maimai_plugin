@@ -30,7 +30,7 @@ except Exception:
     nickname = "宁宁"
 
 
-__version__ = "0.4.1"
+__version__ = "0.4.3"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai",
     description="适用nonebot2的Maimai插件",
@@ -85,7 +85,7 @@ inner_level = on_command("inner_level ", aliases={"定数查歌 "})
 
 
 @inner_level.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event, matcher:Matcher,message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
     if len(argv) > 2 or len(argv) == 0:
         await inner_level.finish("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
@@ -98,14 +98,14 @@ async def _(event: Event, message: Message = CommandArg()):
     s = ""
     for elem in result_set:
         s += f"{elem[0]}. {elem[1]} {elem[3]} {elem[4]}({elem[2]})\n"
-    await inner_level.finish(s.strip())
+    await matcher.finish(s.strip())
 
 
 spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
 
 
 @spec_rand.handle()
-async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event,matcher:Matcher, message: Message = EventMessage()):
     level_labels = ["绿", "黄", "红", "紫", "白"]
     regex = "随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"  # type: ignore
     res = re.match(regex, str(message).lower())
@@ -128,25 +128,25 @@ async def _(event: Event, message: Message = EventMessage()):
                 rand_result = "没有这样的乐曲哦。"
             else:
                 rand_result = song_txt(music_data.random())
-            await spec_rand.send(rand_result)
+            await matcher.send(rand_result)
     except Exception as e:
         print(e)
-        await spec_rand.finish("随机命令错误，请检查语法")
+        await matcher.finish("随机命令错误，请检查语法")
 
 
 mr = on_regex(r".*maimai.*什么")
 
 
 @mr.handle()
-async def _():
-    await mr.finish(song_txt(total_list.random()))
+async def _(matcher:Matcher,):
+    await matcher.finish(song_txt(total_list.random()))
 
 
 search_music = on_regex(r"^查歌.+")
 
 
 @search_music.handle()
-async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event,matcher:Matcher, message: Message = EventMessage()):
     regex = "查歌(.+)"
     name = re.match(regex, str(message)).groups()[0].strip()  # type: ignore
     if name == "":
@@ -160,18 +160,18 @@ async def _(event: Event, message: Message = EventMessage()):
         search_result = ""
         for music in sorted(res, key=lambda i: int(i["id"])):
             search_result += f"{music['id']}. {music['title']}\n"
-        await search_music.finish(
+        await matcher.finish(
             Message([MessageSegment("text", {"text": search_result.strip()})])
         )
     else:
-        await search_music.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
+        await matcher.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
 
 query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
 
 
 @query_chart.handle()
-async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event,matcher:Matcher, message: Message = EventMessage()):
     regex = "([绿黄红紫白]?)id([0-9]+)"
     groups = re.match(regex, str(message)).groups()  # type: ignore
     level_labels = ["绿", "黄", "红", "紫", "白"]
@@ -201,7 +201,7 @@ async def _(event: Event, message: Message = EventMessage()):
     TOUCH: {chart['notes'][3]}
     BREAK: {chart['notes'][4]}
     谱师: {chart['charter']}"""
-                await query_chart.send(
+                await matcher.send(
                     Message(
                         [
                             MessageSegment(
@@ -213,7 +213,7 @@ async def _(event: Event, message: Message = EventMessage()):
                     )
                 )
         except Exception:
-            await query_chart.send("未找到该谱面")
+            await matcher.send("未找到该谱面")
     else:
         name = groups[1]
         music = total_list.by_id(name)
@@ -238,7 +238,7 @@ async def _(event: Event, message: Message = EventMessage()):
                 )
             )
         except Exception:
-            await query_chart.send("未找到该乐曲")
+            await matcher.send("未找到该乐曲")
 
 
 wm_list = ["拼机", "推分", "越级", "下埋", "夜勤", "练底力", "练手法", "打旧框", "干饭", "抓绝赞", "收歌"]
@@ -248,7 +248,7 @@ jrwm = on_command("今日舞萌", aliases={"今日mai"})
 
 
 @jrwm.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event,matcher:Matcher, message: Message = CommandArg()):
     qq = int(event.get_user_id())
     h = hash_(qq)
     rp = h % 100
@@ -262,16 +262,16 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f"宜 {wm_list[i]}\n"
         elif wm_value[i] == 0:
             s += f"忌 {wm_list[i]}\n"
-    s += "千雪提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
+    s += f"{nickname}提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
-    await jrwm.finish(Message([MessageSegment("text", {"text": s})] + song_txt(music)))
+    await matcher.finish(Message([MessageSegment("text", {"text": s})] + song_txt(music)))
 
 
 query_score = on_command("分数线")
 
 
 @query_score.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event,matcher:Matcher, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     argv = str(message).strip().split(" ")
     if len(argv) == 1 and argv[0] == "帮助":
@@ -286,7 +286,7 @@ HOLD\t2/5/10
 SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)"""
-        await query_score.send(
+        await matcher.send(
             Message(
                 [
                     MessageSegment(
@@ -323,20 +323,20 @@ BREAK\t5/12.5/25(外加200落)"""
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(
+            await matcher.send(
                 f"""{music['title']} {level_labels2[level_index]}
 分数线 {line}% 允许的最多 TAP GREAT 数量为 {(total_score * reduce / 10000):.2f}(每个-{10000 / total_score:.4f}%),
 BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(-{break_50_reduce / total_score * 100:.4f}%)"""
             )
         except Exception:
-            await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
+            await matcher.send("格式错误，输入“分数线 帮助”以查看帮助信息")
 
 
 best_40_pic = on_command("b40")
 
 
 @best_40_pic.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event,matcher:Matcher, message: Message = CommandArg()):
     username = str(message).strip()
     at = await get_message_at(event.json())
     usr_id = at_to_usrid(at)
@@ -348,11 +348,11 @@ async def _(event: Event, message: Message = CommandArg()):
         payload = {"username": username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
+        await matcher.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
     elif success == 403:
-        await best_40_pic.send("该用户禁止了其他人获取数据。")
+        await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        await best_40_pic.send(
+        await matcher.send(
             Message(
                 [
                     MessageSegment(
@@ -370,7 +370,7 @@ best_50_pic = on_command("b50")
 
 
 @best_50_pic.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: Event,matcher:Matcher, message: Message = CommandArg()):
     username = str(message).strip()
     at = await get_message_at(event.json())
     usr_id = at_to_usrid(at)
@@ -382,11 +382,11 @@ async def _(event: Event, message: Message = CommandArg()):
         payload = {"username": username, "b50": True}
     img, success = await generate50(payload)
     if success == 400:
-        await best_50_pic.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
+        await matcher.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
     elif success == 403:
-        await best_50_pic.send("该用户禁止了其他人获取数据。")
+        await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        await best_50_pic.send(
+        await matcher.send(
             Message(
                 [
                     MessageSegment(
@@ -432,14 +432,14 @@ force_check_mai_data = on_fullmatch("强制检查mai资源", permission=SUPERUSE
 
 
 @check_mai_data.handle()
-async def _(event: Event):
+async def _(event: Event,matcher:Matcher,):
     await check_mai_data.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
-    await check_mai_data.send(await check_mai())
+    await matcher.send(await check_mai())
 
 
 @force_check_mai_data.handle()
-async def _(event: Event):
-    await force_check_mai_data.send("正在尝试下载，大概需要2-3分钟")
+async def _(event: Event,matcher:Matcher,):
+    await matcher.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
-    await force_check_mai_data.send(await check_mai(force=True))
+    await matcher.send(await check_mai(force=True))

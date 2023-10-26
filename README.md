@@ -24,9 +24,9 @@ _✨maimaiDX，nonebot2插件版本✨_
     <img src="https://img.shields.io/badge/nonebot-2.0.0-red.svg" alt="NoneBot">
 </div>
 
-## 说明（已更新舞萌国服2023，重新下载资源）
+## 说明（已更新图片素材）
 
-从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.0.0
+从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.1.0
 
 修改部分：
 

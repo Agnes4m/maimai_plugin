@@ -4,7 +4,7 @@ from pathlib import Path
 try:
     STATIC = str(Path().joinpath("data/maimai"))
 except FileNotFoundError:
-    STATIC = str(Path(__file__).parent.parent
+    STATIC = str(Path(__file__).parent.parent)
 
 
 def hash_(qq: int):

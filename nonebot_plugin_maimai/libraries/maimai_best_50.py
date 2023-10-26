@@ -1,5 +1,5 @@
 import math
-import os
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import aiohttp
@@ -277,7 +277,7 @@ class DrawBest(object):
             j = num % 7
             chartInfo = sdBest[num]
             pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
-            if not os.path.exists(pngPath):
+            if not Path(pngPath).is_file():
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
@@ -338,7 +338,7 @@ class DrawBest(object):
             j = num % 3
             chartInfo = dxBest[num]
             pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
-            if not os.path.exists(pngPath):
+            if not Path(pngPath).exists:
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
