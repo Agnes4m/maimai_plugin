@@ -75,7 +75,7 @@ class ChartInfo(object):
         fc = ["", "fc", "fcp", "ap", "app"]
         fi = fc.index(data["fc"])
         return cls(
-            idNum=total_list.by_title(data["title"]).id, # type: ignore
+            idNum=total_list.by_title(data["title"]).id,  # type: ignore
             title=data["title"],
             diff=data["level_index"],
             ra=data["ra"],
@@ -212,12 +212,12 @@ class DrawBest(object):
             res += self._getCharWidth(ord(ch))
         return res
 
-    def _changeColumnWidth(self, s: str, len: int) -> str:
+    def _changeColumnWidth(self, s: str, lens: int) -> str:
         res = 0
         sList = []
         for ch in s:
             res += self._getCharWidth(ord(ch))
-            if res <= len:
+            if res <= lens:
                 sList.append(ch)
         return "".join(sList)
 
@@ -254,11 +254,13 @@ class DrawBest(object):
             digit = theRa % 10
             theRa = theRa // 10
             digitImg = Image.open(self.pic_dir + f"UI_NUM_Drating_{digit}.png").convert(
-                "RGBA"
+                "RGBA",
             )
             digitImg = self._resizePic(digitImg, 0.6)
             ratingBaseImg.paste(
-                digitImg, (COLOUMS_RATING[i] - 2, 9), mask=digitImg.split()[3]
+                digitImg,
+                (COLOUMS_RATING[i] - 2, 9),
+                mask=digitImg.split()[3],
             )
             i = i - 1
         return ratingBaseImg
@@ -276,19 +278,19 @@ class DrawBest(object):
         levelTriagle = [(itemW, 0), (itemW - 27, 0), (itemW, 27)]
         rankPic = "D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp".split(" ")
         comboPic = " FC FCp AP APp".split(" ")
-        imgDraw = ImageDraw.Draw(img)
+        imgDraw = ImageDraw.Draw(img)  # noqa: F841
         titleFontName = STATIC + "/adobe_simhei.otf"
-        for num in range(0, len(sdBest)):
+        for num in range(len(sdBest)):
             i = num // 5
             j = num % 5
             chartInfo = sdBest[num]
             pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
-            if not Path(pngPath).exists:
+            if not Path(pngPath).is_file():
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)# type: ignore
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2),  # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: int(p * 0.72))
@@ -304,20 +306,23 @@ class DrawBest(object):
 
             tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font)
             rankImg = Image.open(
-                self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png"
+                self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png",
             ).convert("RGBA")
             rankImg = self._resizePic(rankImg, 0.3)
             temp.paste(rankImg, (88, 28), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(
                     self.pic_dir
-                    + f"UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png"
+                    + f"UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png",
                 ).convert("RGBA")
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119, 27), comboImg.split()[3])
             font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 12, encoding="utf-8")
             tempDraw.text(
-                (8, 44), f"Base: {chartInfo.ds} -> {chartInfo.ra}", "white", font
+                (8, 44),
+                f"Base: {chartInfo.ds} -> {chartInfo.ra}",
+                "white",
+                font,
             )
             font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 18, encoding="utf-8")
             tempDraw.text((8, 60), f"#{num + 1}", "white", font)
@@ -329,24 +334,24 @@ class DrawBest(object):
         for num in range(len(sdBest), sdBest.size):
             i = num // 5
             j = num % 5
-            temp = Image.open(self.cover_dir + f"01000.png").convert("RGB")
+            temp = Image.open(self.cover_dir + "01000.png").convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)# type: ignore
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2),  # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(1))
             img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
-        for num in range(0, len(dxBest)):
+        for num in range(len(dxBest)):
             i = num // 3
             j = num % 3
             chartInfo = dxBest[num]
             pngPath = self.cover_dir + f"{get_cover_len5_id(chartInfo.idNum)}.png"
-            if not Path(pngPath).exists:
+            if not Path(pngPath).is_file():
                 pngPath = self.cover_dir + "01000.png"
             temp = Image.open(pngPath).convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)# type: ignore
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2),  # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: int(p * 0.72))
@@ -362,20 +367,23 @@ class DrawBest(object):
 
             tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', "white", font)
             rankImg = Image.open(
-                self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png"
+                self.pic_dir + f"UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png",
             ).convert("RGBA")
             rankImg = self._resizePic(rankImg, 0.3)
             temp.paste(rankImg, (88, 28), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(
                     self.pic_dir
-                    + f"UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png"
+                    + f"UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png",
                 ).convert("RGBA")
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119, 27), comboImg.split()[3])
             font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 12, encoding="utf-8")
             tempDraw.text(
-                (8, 44), f"Base: {chartInfo.ds} -> {chartInfo.ra}", "white", font
+                (8, 44),
+                f"Base: {chartInfo.ds} -> {chartInfo.ra}",
+                "white",
+                font,
             )
             font = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 18, encoding="utf-8")
             tempDraw.text((8, 60), f"#{num + 1}", "white", font)
@@ -387,17 +395,17 @@ class DrawBest(object):
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
-            temp = Image.open(self.cover_dir + f"01000.png").convert("RGB")
+            temp = Image.open(self.cover_dir + "01000.png").convert("RGB")
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop(
-                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2)# type: ignore
+                (0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2),  # type: ignore
             )
             temp = temp.filter(ImageFilter.GaussianBlur(1))
             img.paste(temp, (self.COLOUMS_IMG[j + 6] + 4, self.ROWS_IMG[i + 1] + 4))
 
     def draw(self):
         splashLogo = Image.open(
-            self.pic_dir + "UI_CMN_TabTitle_MaimaiTitle_Ver214.png"
+            self.pic_dir + "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
         ).convert("RGBA")
         splashLogo = self._resizePic(splashLogo, 0.65)
         self.img.paste(splashLogo, (10, 10), mask=splashLogo.split()[3])
@@ -418,7 +426,7 @@ class DrawBest(object):
         self.img.paste(namePlateImg, (240, 40), mask=namePlateImg.split()[3])
 
         shougouImg = Image.open(self.pic_dir + "UI_CMN_Shougou_Rainbow.png").convert(
-            "RGBA"
+            "RGBA",
         )
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 14, encoding="utf-8")
@@ -444,12 +452,15 @@ class DrawBest(object):
         self._drawBestList(self.img, self.sdBest, self.dxBest)
 
         authorBoardImg = Image.open(self.pic_dir + "UI_CMN_MiniDialog_01.png").convert(
-            "RGBA"
+            "RGBA",
         )
         authorBoardImg = self._resizePic(authorBoardImg, 0.35)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
         authorBoardDraw.text(
-            (31, 28), "   Generated By\nXybBot & Chiyuki", "black", font2
+            (31, 28),
+            "   Generated By\nXybBot & Chiyuki",
+            "black",
+            font2,
         )
         self.img.paste(authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3])
 

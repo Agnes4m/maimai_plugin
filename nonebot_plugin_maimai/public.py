@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import random
 import re
 import subprocess
@@ -12,11 +11,13 @@ import aiohttp
 import httpx
 from bs4 import BeautifulSoup
 from nonebot import get_driver, on_command
-from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
-from nonebot.exception import IgnoredException
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
+
+# from nonebot.exception import IgnoredException
 from nonebot.log import logger
 from nonebot.matcher import Matcher
-from nonebot.message import event_preprocessor
+
+# from nonebot.message import event_preprocessor
 from nonebot.params import CommandArg, RawCommand
 from nonebot_plugin_txt2img import Txt2Img
 from pydantic import BaseModel, Extra
@@ -151,10 +152,11 @@ async def get_target(keyword: str):
             msg["url"]["视频链接:"] = "https:" + val.find("a")["href"] + "\n"  # type: ignore
             try:
                 msg["data"]["up主:"] = item.find(
-                    "span", class_="bili-video-card__info--author"
+                    "span",
+                    class_="bili-video-card__info--author",
                 ).text.strip()  # type: ignore
                 msg["data"]["视频观看量:"] = item.select(
-                    "span.bili-video-card__stats--item span"
+                    "span.bili-video-card__stats--item span",
                 )[0].text.strip()
             except (AttributeError, IndexError):
                 continue
@@ -163,10 +165,12 @@ async def get_target(keyword: str):
                 1
             ].text.strip()
             msg["data"]["上传时间:"] = item.find(
-                "span", class_="bili-video-card__info--date"
+                "span",
+                class_="bili-video-card__info--date",
             ).text.strip()  # type: ignore
             msg["data"]["视频时长:"] = item.find(
-                "span", class_="bili-video-card__stats__duration"
+                "span",
+                class_="bili-video-card__stats__duration",
             ).text.strip()  # type: ignore
             msg["url"]["封面:"] = "https:" + item.find("img").get("src")  # type: ignore
             # except:
@@ -188,7 +192,8 @@ def getDownloadUrl(url: str):
         resp = client.get(url, headers=headers)
         print(resp.text)
         info = re.search(
-            r"<script>window\.__playinfo__=({.*})<\/script><script>", resp.text
+            r"<script>window\.__playinfo__=({.*})<\/script><script>",
+            resp.text,
         )[  # type: ignore
             1
         ]  # type: ignore
@@ -203,6 +208,7 @@ def getDownloadUrl(url: str):
         )
         if videoUrl and audioUrl:
             return videoUrl, audioUrl
+        return None
 
 
 async def downloadBFile(url, fullFileName, progressCallback):
@@ -218,7 +224,7 @@ async def downloadBFile(url, fullFileName, progressCallback):
             currentLen = 0
             totalLen = int(resp.headers["content-length"])
             print(totalLen)
-            with open(fullFileName, "wb") as f:
+            with Path(fullFileName).open("wb") as f:
                 async for chunk in resp.aiter_bytes():
                     currentLen += len(chunk)
                     f.write(chunk)
@@ -226,7 +232,10 @@ async def downloadBFile(url, fullFileName, progressCallback):
 
 
 def mergeFileToMp4(
-    vFullFileName: str, aFullFileName: str, outputFileName: str, shouldDelete=True
+    vFullFileName: str,
+    aFullFileName: str,
+    outputFileName: str,
+    shouldDelete=True,
 ):
     """
         合并视频文件和音频文件
@@ -245,8 +254,8 @@ def mergeFileToMp4(
     )
     # 删除临时文件
     if shouldDelete:
-        os.unlink(vFullFileName)
-        os.unlink(aFullFileName)
+        Path(vFullFileName).unlink()
+        Path(aFullFileName).unlink()
 
 
 def delete_boring_characters(sentence):
@@ -256,7 +265,9 @@ def delete_boring_characters(sentence):
     :return:
     """
     return re.sub(
-        "[0-9’!\"∀〃#$%&'()*+,-./:;<=>?@，。?★、…【】《》？“”‘’！[\\]^_`{|}~～\s]+", "", sentence  # type: ignore
+        "[0-9’!\"∀〃#$%&'()*+,-./:;<=>?@，。?★、…【】《》？“”‘’！[\\]^_`{|}~～\s]+",
+        "",
+        sentence,  # type: ignore
     )
 
 
@@ -265,10 +276,10 @@ async def b_to_url(url: str, matcher: Matcher, video_title: str):
     base_video_info = "http://api.bilibili.com/x/web-interface/view"
     video_id = re.search(r"video\/[^\?\/ ]+", url)[0].split("/")[1]  # type: ignore
     logger.info(video_id)
-    video_titles = httpx.get(
+    video_titles = httpx.get(  # noqa: ASYNC100
         f"{base_video_info}?bvid={video_id}"
         if video_id.startswith("BV")
-        else f"{base_video_info}?aid={video_id}"
+        else f"{base_video_info}?aid={video_id}",
     )
     if video_titles.status_code != 200:
         await matcher.finish(f"{url}\nck已失效，请尝试重新获取")
@@ -284,7 +295,9 @@ async def b_to_url(url: str, matcher: Matcher, video_title: str):
         downloadBFile(audio_url, f"{video_title}-audio.m4s", logger.info),
     )
     mergeFileToMp4(
-        f"{video_title}-video.m4s", f"{video_title}-audio.m4s", f"{path}-res.mp4"
+        f"{video_title}-video.m4s",
+        f"{video_title}-audio.m4s",
+        f"{path}-res.mp4",
     )
     # logger.info(os.getcwd())
     # 发送出去
@@ -292,31 +305,33 @@ async def b_to_url(url: str, matcher: Matcher, video_title: str):
     await matcher.send(MessageSegment.video(f"{path}-res.mp4"))
     # logger.info(f'{path}-res.mp4')
     # 清理文件
-    os.unlink(f"{video_title}-res.mp4")
-    os.unlink(f"{video_title}-res.mp4.jpg")
+    Path(f"{video_title}-res.mp4").unlink()
+    Path(f"{video_title}-res.mp4.jpg").unlink()
 
 
-async def check_mai(force: bool = False):
+async def check_mai(force: bool = False):  # noqa: FBT001
     """检查mai资源"""
-    await update_pl() # 获取json文件
+    await update_pl()  # 获取json文件
     if not Path(STATIC).joinpath("mai/pic").exists() or force:
         logger.info("初次使用，正在尝试自动下载资源\n资源包大小预计90M")
         try:
-            response = httpx.get("https://www.diving-fish.com/maibot/static.zip")
+            response = httpx.get(  # noqa: ASYNC100
+                "https://www.diving-fish.com/maibot/static.zip",
+            )  # noqa: ASYNC100
             static_data = response.content
 
-            with open("static.zip", "wb") as f:
+            with Path("static.zip").open("wb") as f:
                 f.write(static_data)
             logger.success("已成功下载，正在尝试解压mai资源")
             with zipfile.ZipFile("static.zip", "r") as zip_file:
                 zip_file.extractall(Path("data/maimai"))
             logger.success("mai资源已完整，尝试删除缓存")
-            # Path("static.zip").unlink()  # 删除下载的压缩文件
-            return "mai资源下载成功，请使用【舞萌帮助】获取指令"
+            Path("static.zip").unlink()  # 删除下载的压缩文件
+            msg = "mai资源下载成功，请使用【舞萌帮助】获取指令"
+
         except Exception as e:
             logger.warning(f"自动下载出错\n{e}\n请自行尝试手动下载")
-            return f"自动下载出错\n{e}\n请自行尝试手动下载"
-    else:
-        logger.info("已经成功下载，无需下载")
-        return "已经成功下载，无需下载"
-    
+            msg = f"自动下载出错\n{e}\n请自行尝试手动下载"
+        return msg
+    logger.info("已经成功下载，无需下载")
+    return "已经成功下载，无需下载"
