@@ -2,9 +2,9 @@ import time
 from pathlib import Path
 
 try:
-    STATIC = str(Path().joinpath("data/maimai/static"))
+    STATIC = str(Path().joinpath("data/maimai"))
 except FileNotFoundError:
-    STATIC = str(Path(__file__).parent.parent.joinpath("static"))
+    STATIC = str(Path(__file__).parent.parent
 
 
 def hash_(qq: int):
