@@ -6,6 +6,7 @@ from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
 require("nonebot_plugin_txt2img")
+require("nonebot_plugin_saa")
 import re
 from typing import Any
 
