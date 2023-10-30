@@ -32,8 +32,8 @@ except Exception:
 
 __version__ = "0.4.4"
 __plugin_meta__ = PluginMetadata(
-    name="舞萌maimai",
-    description="适用nonebot2的Maimai插件",
+    name="舞萌maimai-bot",
+    description="移植mai-bot,适用nonebot2的Maimai插件",
     usage="指令：舞萌帮助",
     type="application",
     homepage="https://github.com/Agnes4m/maimai_plugin",
