@@ -11,9 +11,24 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from .maimaidx_music import get_cover_len5_id, total_list
 from .tool import STATIC
 
-scoreRank = "D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+".split(" ")
-combo = " FC FC+ AP AP+".split(" ")
-diffs = "Basic Advanced Expert Master Re:Master".split(" ")
+scoreRank = [
+    "D",
+    "C",
+    "B",
+    "BB",
+    "BBB",
+    "A",
+    "AA",
+    "AAA",
+    "S",
+    "S+",
+    "SS",
+    "SS+",
+    "SSS",
+    "SSS+",
+]
+combo = ["", "FC", "FC+", "AP", "AP+"]
+diffs = ["Basic", "Advanced", "Expert", "Master", "Re:Master"]
 
 
 class ChartInfo(object):
@@ -150,7 +165,9 @@ class DrawBest(object):
             inside_code = 0x0020
         else:
             inside_code -= 0xFEE0
-        if inside_code < 0x0020 or inside_code > 0x7E:  # 转完之后不是半角字符返回原来的字符
+        if (
+            inside_code < 0x0020 or inside_code > 0x7E
+        ):  # 转完之后不是半角字符返回原来的字符
             return uchar
         return chr(inside_code)
 
@@ -276,8 +293,23 @@ class DrawBest(object):
             (217, 197, 233),
         ]
         levelTriagle = [(itemW, 0), (itemW - 27, 0), (itemW, 27)]
-        rankPic = "D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp".split(" ")
-        comboPic = " FC FCp AP APp".split(" ")
+        rankPic = [
+            "D",
+            "C",
+            "B",
+            "BB",
+            "BBB",
+            "A",
+            "AA",
+            "AAA",
+            "S",
+            "Sp",
+            "SS",
+            "SSp",
+            "SSS",
+            "SSSp",
+        ]
+        comboPic = ["", "FC", "FCp", "AP", "APp"]
         imgDraw = ImageDraw.Draw(img)  # noqa: F841
         titleFontName = STATIC + "/adobe_simhei.otf"
         for num in range(len(sdBest)):
@@ -432,9 +464,10 @@ class DrawBest(object):
         font2 = ImageFont.truetype(STATIC + "/adobe_simhei.otf", 14, encoding="utf-8")
         playCountInfo = f"底分: {self.musicRating} + 段位分: {self.rankRating}"
         shougouImgW, shougouImgH = shougouImg.size
-        playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
+        bbox = shougouDraw.textbbox((0, 0), playCountInfo, font2)
+        playCountInfoW, _ = bbox[2] - bbox[0], bbox[3] - bbox[1]
         textPos = (
-            (shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2,
+            (shougouImgW - playCountInfoW) / 2,
             5,
         )
         shougouDraw.text((textPos[0] - 1, textPos[1]), playCountInfo, "black", font2)

@@ -12,11 +12,13 @@ fontpath = STATIC + "/msyh.ttc"
 def draw_text(img_pil, text, offset_x):
     draw = ImageDraw.Draw(img_pil)
     font = ImageFont.truetype(fontpath, 48)
-    width, height = draw.textsize(text, font)
+    left, top, right, bottom = draw.textbbox((0, 0), text, font)
+    width, height = right - left, bottom - top
     x = 5
     if width > 390:
         font = ImageFont.truetype(fontpath, int(390 * 48 / width))
-        width, height = draw.textsize(text, font)
+        left, top, right, bottom = draw.textbbox((0, 0), text, font)
+        width, height = right - left, bottom - top
     else:
         x = int((400 - width) / 2)
     draw.rectangle(
@@ -34,10 +36,11 @@ def text_to_image(text):
     max_width = 0
     h = 0
     for text in text_list:
-        w, h = font.getsize(text)
+        left, top, right, bottom = font.getbbox(text)
+        w, h = right - left, bottom - top
         max_width = max(max_width, w)
-    wa = max_width + padding * 2
-    ha = h * len(text_list) + margin * (len(text_list) - 1) + padding * 2
+    wa = int(max_width + padding * 2)
+    ha = int(h * len(text_list) + margin * (len(text_list) - 1) + padding * 2)
     i = Image.new("RGB", (wa, ha), color=(255, 255, 255))
     draw = ImageDraw.Draw(i)
     for j in range(len(text_list)):
