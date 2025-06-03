@@ -93,7 +93,7 @@ class ChartInfo(object):
             idNum=total_list.by_title(data["title"]).id,  # type: ignore
             title=data["title"],
             diff=data["level_index"],
-            ra=data["ra"],
+            ra=computeRa(data["ds"], data["achievements"]),
             ds=data["ds"],
             comboId=fi,
             scoreId=ri,

@@ -5,14 +5,12 @@ from typing import List, Set, Union
 import aiofiles
 import httpx
 from nonebot import get_driver, on_command
-from nonebot.adapters.onebot.v11 import MessageSegment
 
 # from nonebot.exception import IgnoredException
 from nonebot.log import logger
 from nonebot.matcher import Matcher
 
 # from nonebot.message import event_preprocessor
-from nonebot_plugin_txt2img import Txt2Img
 from pydantic import BaseModel
 
 from .api import update_pl
@@ -64,14 +62,7 @@ XXXmaimaiXXX什么 随机一首歌
     #         "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
     #     })
     # ]))
-    title = "可用命令如下："
-    txt2img = Txt2Img()
-    txt2img.set_font_size(size=32)
-    pic = txt2img.draw(title, help_str)
-    try:
-        await matcher.send(MessageSegment.image(pic))
-    except Exception:
-        await matcher.send(help_str)
+    await matcher.send(help_str)
 
 
 async def check_mai(force: bool = False):  # noqa: FBT001

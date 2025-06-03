@@ -35,10 +35,14 @@ async def _(matcher: Matcher, event: Event, arg: Message = CommandArg()):
         await matcher.finish("参数错误，应当为1-2个参数")
         return
     try:
-        with Path(STATIC).parent.joinpath("site.json").open(
-            mode="r",
-            encoding="utf-8",
-        ) as f:
+        with (
+            Path(STATIC)
+            .parent.joinpath("site.json")
+            .open(
+                mode="r",
+                encoding="utf-8",
+            ) as f
+        ):
             data_site: List[Dict[str, str]] = json.loads(f.read())
     except Exception:
         data_site = []
@@ -70,10 +74,14 @@ async def _(matcher: Matcher, event: Event, arg: Message = CommandArg()):
         result = output_params.get("result")
         await matcher.send(f"{result}")
     try:
-        with Path(STATIC).parent.joinpath("player.json").open(
-            "r",
-            encoding="utf-8",
-        ) as f:
+        with (
+            Path(STATIC)
+            .parent.joinpath("player.json")
+            .open(
+                "r",
+                encoding="utf-8",
+            ) as f
+        ):
             player_json: Dict[str, List[str]] = json.loads(f.read())
     except Exception:
         player_json = {}
@@ -92,10 +100,14 @@ async def _(
 ):
     usr_id = event.get_user_id()
     try:
-        with Path(STATIC).parent.joinpath("player.json").open(
-            "r",
-            encoding="utf-8",
-        ) as f:
+        with (
+            Path(STATIC)
+            .parent.joinpath("player.json")
+            .open(
+                "r",
+                encoding="utf-8",
+            ) as f
+        ):
             player_json: Dict[str, List[str]] = json.loads(f.read())
     except Exception:
         player_json = {}
@@ -122,10 +134,14 @@ async def update_pl():
         async with session.get(urls) as response:
             result = await response.json()
     if result:
-        with Path(STATIC).parent.joinpath("site.json").open(
-            mode="w",
-            encoding="utf-8",
-        ) as f:
+        with (
+            Path(STATIC)
+            .parent.joinpath("site.json")
+            .open(
+                mode="w",
+                encoding="utf-8",
+            ) as f
+        ):
             json.dump(result, f, ensure_ascii=False)
 
 

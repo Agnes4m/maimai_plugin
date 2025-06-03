@@ -1,3 +1,6 @@
+import re
+from typing import Any
+
 from nonebot import get_driver, on_command, on_regex, require
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
@@ -5,10 +8,8 @@ from nonebot.params import CommandArg, EventMessage
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
-require("nonebot_plugin_txt2img")
-require("nonebot_plugin_saa")
-import re
-from typing import Any
+require("nonebot_plugin_alconna")
+from nonebot_plugin_alconna import UniMessage
 
 from .api import bind_site, show_all  # noqa: F401
 from .libraries.image import *
@@ -30,7 +31,7 @@ except Exception:
     nickname = "宁宁"
 
 
-__version__ = "0.4.4"
+__version__ = "0.5.0"
 __plugin_meta__ = PluginMetadata(
     name="舞萌maimai-bot",
     description="移植mai-bot,适用nonebot2的Maimai插件",
@@ -46,17 +47,15 @@ __plugin_meta__ = PluginMetadata(
 
 
 def song_txt(music: Music):
-    return Message(
-        [
-            MessageSegment("text", {"text": f"{music.id}. {music.title}\n"}),
-            MessageSegment(
-                "image",
-                {
-                    "file": f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png",
-                },
-            ),
-            MessageSegment("text", {"text": f"\n{'/'.join(music.level)}"}),  # type: ignore
-        ],
+    return UniMessage(
+        MessageSegment("text", {"text": f"{music.id}. {music.title}\n"}),
+        MessageSegment(
+            "image",
+            {
+                "file": f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png",
+            },
+        ),
+        MessageSegment("text", {"text": f"\n{'/'.join(music.level)}"}),  # type: ignore
     )
 
 
@@ -88,7 +87,9 @@ inner_level = on_command("inner_level ", aliases={"定数查歌 "})
 async def _(matcher: Matcher, message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
     if len(argv) > 2 or len(argv) == 0:
-        await inner_level.finish("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
+        await inner_level.finish(
+            "命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>",
+        )
     if len(argv) == 1:
         result_set = inner_level_q(float(argv[0]))
     else:
@@ -119,18 +120,17 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
                 tp = ["SD", "DX"]
             level = res.groups()[2]
             if res.groups()[1] == "":
-                music_data = total_list.filter(level=level, type=tp)
+                music_data = total_list.filter(level=level, type_=tp)
             else:
                 music_data = total_list.filter(
                     level=level,
                     diff=["绿黄红紫白".index(res.groups()[1])],
-                    type=tp,
+                    type_=tp,
                 )
             if len(music_data) == 0 or music_data is None:  # type: ignore
-                rand_result = "没有这样的乐曲哦。"
+                await matcher.send("没有这样的乐曲哦。")
             else:
-                rand_result = song_txt(music_data.random())
-            await matcher.send(rand_result)
+                await matcher.send(Message(song_txt(music_data.random())))
     except Exception as e:
         print(e)
         await matcher.finish("随机命令错误，请检查语法")
@@ -140,10 +140,8 @@ mr = on_regex(r".*maimai.*什么")
 
 
 @mr.handle()
-async def _(
-    matcher: Matcher,
-):
-    await matcher.finish(song_txt(total_list.random()))
+async def _():
+    await song_txt(total_list.random()).finish()
 
 
 search_music = on_regex(r"^查歌.+")
@@ -247,7 +245,19 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
             await matcher.send("未找到该乐曲")
 
 
-wm_list = ["拼机", "推分", "越级", "下埋", "夜勤", "练底力", "练手法", "打旧框", "干饭", "抓绝赞", "收歌"]
+wm_list = [
+    "拼机",
+    "推分",
+    "越级",
+    "下埋",
+    "夜勤",
+    "练底力",
+    "练手法",
+    "打旧框",
+    "干饭",
+    "抓绝赞",
+    "收歌",
+]
 
 
 jrwm = on_command("今日舞萌", aliases={"今日mai"})

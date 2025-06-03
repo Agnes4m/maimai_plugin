@@ -33,7 +33,6 @@ _✨maimaiDX，nonebot2插件版本✨_
 - b40/b50可以艾特人查询
 - static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
 - （可循）env设置 `maimai_font`,是str对象的`字体`
-- 新增指令`搜手元`,`搜理论`,`搜谱面确认`，后面带上搜索的对象
 - 新增指令检查mai资源可以初始化下载，或者强制检查mai资源强制下载覆盖
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,

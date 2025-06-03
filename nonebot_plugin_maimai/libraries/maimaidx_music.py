@@ -49,10 +49,9 @@ def in_or_equal(checker: Any, elem: Optional[Union[Any, List[Any]]]):
         return True
     if isinstance(elem, List):
         return checker in elem
-    elif isinstance(elem, Tuple):
+    if isinstance(elem, Tuple):
         return elem[0] <= checker <= elem[1]
-    else:
-        return checker == elem
+    return checker == elem
 
 
 class Chart(Dict):
@@ -66,15 +65,15 @@ class Chart(Dict):
     def __getattribute__(self, item):
         if item == "tap":
             return self["notes"][0]
-        elif item == "hold":
+        if item == "hold":
             return self["notes"][1]
-        elif item == "slide":
+        if item == "slide":
             return self["notes"][2]
-        elif item == "touch":
+        if item == "touch":
             return self["notes"][3] if len(self["notes"]) == 5 else 0
-        elif item == "brk":
+        if item == "brk":
             return self["notes"][-1]
-        elif item == "charter":
+        if item == "charter":
             return self["charter"]
         return super().__getattribute__(item)
 
@@ -99,7 +98,7 @@ class Music(Dict):
             if item == "version":
                 return self["basic_info"]["from"]
             return self["basic_info"][item]
-        elif item in self:
+        if item in self:
             return self[item]
         return super().__getattribute__(item)
 
@@ -128,7 +127,7 @@ class MusicList(List[Music]):
         title_search: Optional[str] = ...,
         genre: Optional[Union[str, List[str]]] = ...,
         bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-        type: Optional[Union[str, List[str]]] = ...,
+        type_: Optional[Union[str, List[str]]] = ...,
         diff: List[int] = ...,
     ):
         new_list = MusicList()
@@ -136,13 +135,13 @@ class MusicList(List[Music]):
             diff2 = diff
             music = deepcopy(music)
             if not music.level:
-                return
+                return None
             if not music.ds:
-                return 
+                return None
             if not title_search:
-                return
+                return None
             if not music.title:
-                return
+                return None
             ret, diff2 = cross(music.level, level, diff2)
             if not ret:
                 continue
@@ -151,7 +150,7 @@ class MusicList(List[Music]):
                 continue
             if not in_or_equal(music.genre, genre):
                 continue
-            if not in_or_equal(music.type, type):
+            if not in_or_equal(music.type, type_):
                 continue
             if not in_or_equal(music.bpm, bpm):
                 continue
@@ -179,7 +178,7 @@ async def main():
         total_list[__i] = Music(total_list[__i])
         if total_list[__i].charts is None:
             return None
-        for __j in range(len(total_list[__i].charts)): # type: ignore
+        for __j in range(len(total_list[__i].charts)):  # type: ignore
             total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
 
 
