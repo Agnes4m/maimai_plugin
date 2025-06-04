@@ -1,7 +1,7 @@
 import asyncio
 import random
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
 
 import aiohttp
 
@@ -91,7 +91,7 @@ class Music(Dict):
     release_date: Optional[str] = None
     artist: Optional[str] = None
 
-    diff: List[int] = []
+    diff: ClassVar[List[int]] = []
 
     def __getattribute__(self, item):
         if item in {"genre", "artist", "release_date", "bpm", "version"}:
@@ -177,7 +177,7 @@ async def main():
     for __i in range(len(total_list)):
         total_list[__i] = Music(total_list[__i])
         if total_list[__i].charts is None:
-            return None
+            return
         for __j in range(len(total_list[__i].charts)):  # type: ignore
             total_list[__i].charts[__j] = Chart(total_list[__i].charts[__j])
 

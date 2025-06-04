@@ -5,8 +5,6 @@ from typing import List, Set, Union
 import aiofiles
 import httpx
 from nonebot import get_driver, on_command
-
-# from nonebot.exception import IgnoredException
 from nonebot.log import logger
 from nonebot.matcher import Matcher
 
@@ -29,16 +27,6 @@ class Config(BaseModel):
 
 
 config = Config.parse_obj(get_driver().config)
-
-
-# @event_preprocessor
-# async def preprocessor(bot: Bot, event:Event, state):
-#     if (
-#         hasattr(event, "message_type")
-#         and event.message_type == "private"
-#         and event.sub_type != "friend"
-#     ):
-#         raise IgnoredException("not reply group temp message")
 
 
 help_msg = on_command("help", aliases={"舞萌帮助", "mai帮助"})
