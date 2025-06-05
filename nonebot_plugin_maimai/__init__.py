@@ -1,10 +1,38 @@
+import json
 import re
 from typing import Any
 
 from nonebot import get_driver, on_command, on_regex, require
-from nonebot.adapters import Event
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.adapters import Event, Message
+from nonebot.adapters import MessageSegment as BaseMessageSegment
 from nonebot.params import CommandArg, EventMessage
+
+
+class MaiMessageSegment(BaseMessageSegment):
+    def __init__(self, _type: str, data: dict):
+        super().__init__(type=_type, data=data)
+
+    @classmethod
+    def get_message_class(cls):
+        from nonebot.adapters import Message
+
+        return Message
+
+    def __str__(self) -> str:
+        if self.type == "text":
+            return self.data["text"]
+        if self.type == "image":
+            return f"[image:{self.data['file']}]"
+        return f"[{self.type}]"
+
+    def is_text(self) -> bool:
+        raise NotImplementedError
+
+
+def MessageSegment(_type: str, data: dict) -> MaiMessageSegment:
+    return MaiMessageSegment(_type, data)
+
+
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
@@ -130,7 +158,7 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
             if len(music_data) == 0 or music_data is None:  # type: ignore
                 await matcher.send("没有这样的乐曲哦。")
             else:
-                await matcher.send(Message(song_txt(music_data.random())))
+                await song_txt(music_data.random()).send()
     except Exception as e:
         print(e)
         await matcher.finish("随机命令错误，请检查语法")
@@ -162,9 +190,7 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
         search_result = ""
         for music in sorted(res, key=lambda i: int(i["id"])):
             search_result += f"{music['id']}. {music['title']}\n"
-        await matcher.finish(
-            Message([MessageSegment("text", {"text": search_result.strip()})]),
-        )
+        await UniMessage.text(search_result.strip()).send()
     else:
         await matcher.send(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
@@ -203,18 +229,22 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
     TOUCH: {chart['notes'][3]}
     BREAK: {chart['notes'][4]}
     谱师: {chart['charter']}"""
-                await matcher.send(
-                    Message(
-                        [
-                            MessageSegment(
-                                "text",
-                                {"text": f"{music['id']}. {music['title']}\n"},
-                            ),
-                            MessageSegment("image", {"file": f"{file}"}),
-                            MessageSegment("text", {"text": msg}),
-                        ],
-                    ),
-                )
+                send_msg = UniMessage.text(f"{music['id']}. {music['title']}\n")
+                send_msg.append(UniMessage.image(url=file))
+                send_msg.append(UniMessage.text(msg))
+
+                # await matcher.send(
+                #     Message(
+                #         [
+                #             MessageSegment(
+                #                 "text",
+                #                 {"text": f"{music['id']}. {music['title']}\n"},
+                #             ),
+                #             MessageSegment("image", {"file": f"{file}"}),
+                #             MessageSegment("text", {"text": msg}),
+                #         ],
+                #     ),
+                # )
         except Exception:
             await matcher.send("未找到该谱面")
     else:
@@ -224,23 +254,34 @@ async def _(matcher: Matcher, message: Message = EventMessage()):
             if not music:
                 return
             file = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
-            await query_chart.send(
-                Message(
-                    [
-                        MessageSegment(
-                            "text",
-                            {"text": f"{music['id']}. {music['title']}\n"},
-                        ),
-                        MessageSegment("image", {"file": f"{file}"}),
-                        MessageSegment(
-                            "text",
-                            {
-                                "text": f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n难度: {'/'.join(music['level'])}",
-                            },
-                        ),
-                    ],
+
+            send_msg = UniMessage.text(f"{music['id']}. {music['title']}\n")
+            send_msg.append(UniMessage.image(url=file))
+            send_msg.append(
+                UniMessage.text(
+                    f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\
+                \n版本: {music['basic_info']['from']}\n难度: {'/'.join(music['level'])}",
                 ),
             )
+            await send_msg.send()
+
+            # await query_chart.send(
+            #     Message(
+            #         [
+            #             MessageSegment(
+            #                 "text",
+            #                 {"text": f"{music['id']}. {music['title']}\n"},
+            #             ),
+            #             MessageSegment("image", {"file": f"{file}"}),
+            #             MessageSegment(
+            #                 "text",
+            #                 {
+            #                     "text": f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n难度: {'/'.join(music['level'])}",
+            #                 },
+            #             ),
+            #         ],
+            #     ),
+            # )
         except Exception:
             await matcher.send("未找到该乐曲")
 
@@ -264,7 +305,7 @@ jrwm = on_command("今日舞萌", aliases={"今日mai"})
 
 
 @jrwm.handle()
-async def _(event: Event, matcher: Matcher):
+async def _(event: Event):
     qq = int(event.get_user_id())
     h = hash_(qq)
     rp = h % 100
@@ -280,9 +321,10 @@ async def _(event: Event, matcher: Matcher):
             s += f"忌 {wm_list[i]}\n"
     s += f"{nickname}提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
-    await matcher.finish(
-        Message([MessageSegment("text", {"text": s}), *song_txt(music)]),
-    )
+    send_msg = UniMessage.text(s)
+    send_msg.append(UniMessage.text(*song_txt(music)))
+
+    await UniMessage([str(MessageSegment("text", {"text": s})), *song_txt(music)]).send()
 
 
 query_score = on_command("分数线")
@@ -304,18 +346,9 @@ HOLD\t2/5/10
 SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)"""
-        await matcher.send(
-            Message(
-                [
-                    MessageSegment(
-                        "image",
-                        {
-                            "file": f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}",
-                        },
-                    ),
-                ],
-            ),
-        )
+        img_image = text_to_image(s)
+        base64_img = image_to_base64(img_image)
+        await UniMessage.image(raw=base64_img).send()
     elif len(argv) == 2:
         try:
             grp = re.match(r, argv[0]).groups()  # type: ignore
@@ -350,14 +383,74 @@ BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT
             await matcher.send("格式错误，输入“分数线 帮助”以查看帮助信息")
 
 
+player_json = Path("data/maimai")
+player_json.mkdir(exist_ok=True, parents=True)
+player_file = player_json / "player.json"
+if not player_file.exists():
+    with player_file.open("w", encoding="utf-8") as f:
+        json.dump({}, f)
+
+mai_bind = on_command("maibind", aliases={"mai绑定"}, block=False)
+mai_del = on_command("maidel", aliases={"mai解绑", "mai删除"}, block=False)
+
+
+@mai_bind.handle()
+async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
+    logger.info("[maimai]正在执行绑定操作...")
+
+    qq = message.extract_plain_text().strip()
+    _id = event.get_user_id()
+    if not qq:
+        await matcher.finish("请在绑定后加上QQ号")
+    if not qq.isdigit() or len(qq) > 11:
+        await matcher.finish("请输入正确的QQ号码")
+    data_json: Dict[str, str] = json.loads(player_file.read_text(encoding="utf-8"))
+    data_json.update({_id: qq})
+    with player_file.open("w", encoding="utf-8") as f:
+        json.dump(data_json, f)
+    await matcher.finish(f"绑定成功,qq号为{qq}")
+
+
+@mai_del.handle()
+async def _(event: Event, matcher: Matcher):
+    logger.info("[maimai]正在执行解绑操作...")
+    _id = event.get_user_id()
+    data_json: Dict[str, str] = json.loads(player_file.read_text(encoding="utf-8"))
+    if _id not in data_json:
+        await matcher.finish("你还没有绑定过QQ号")
+    del data_json[_id]
+    with player_file.open("w", encoding="utf-8") as f:
+        json.dump(data_json, f)
+    await matcher.finish("已解除绑定")
+
+
 best_40_pic = on_command("b40")
 
 
 @best_40_pic.handle()
 async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
-    username = str(message).strip()
-    at = await get_message_at(event.json())
-    usr_id = at_to_usrid(at)
+    logger.info("[maimai]正在执行b40操作...")
+    username = message.extract_plain_text().strip()
+    at = await get_message_at(event.model_dump_json())
+    usr_id = at_to_usrid(at, event)
+
+    # 读取绑定账户
+    try:
+        with player_file.open("r", encoding="utf-8") as f:
+            try:
+                player_map = json.load(f)
+                if not isinstance(player_map, dict):
+                    player_map = {}
+            except (json.JSONDecodeError, TypeError):
+                player_map = {}
+        logger.info(player_map)
+        logger.info(type(player_map))
+        if usr_id and str(usr_id) in player_map:
+            usr_id = str(player_map[str(usr_id)])
+    except (FileNotFoundError, PermissionError, IOError) as e:
+        logger.warning(f"读取玩家绑定文件失败: {e}")
+        player_map = {}
+
     if at:
         payload = {"qq": usr_id}
     elif username == "":
@@ -370,28 +463,37 @@ async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
     elif success == 403:
         await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        await matcher.send(
-            Message(
-                [
-                    MessageSegment(
-                        "image",
-                        {
-                            "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}",
-                        },
-                    ),
-                ],
-            ),
-        )
+        base64_img = image_to_base64(img)
+
+        await UniMessage.image(raw=base64_img).send()
 
 
-best_50_pic = on_command("b50")
+best_50_pic = on_command("b50", aliases={"maib50"})
 
 
 @best_50_pic.handle()
 async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
+    logger.info("[maimai]正在执行b50操作...")
     username = str(message).strip()
-    at = await get_message_at(event.json())
-    usr_id = at_to_usrid(at)
+    at = await get_message_at(event.model_dump_json())
+    usr_id = at_to_usrid(at, event)
+
+    # 读取绑定账户
+    try:
+        with player_file.open("r", encoding="utf-8") as f:
+            try:
+                player_map = json.load(f)
+                if not isinstance(player_map, dict):
+                    player_map = {}
+            except (json.JSONDecodeError, TypeError):
+                player_map = {}
+        logger.info(player_map)
+        if usr_id and str(usr_id) in player_map:
+            usr_id = str(player_map[str(usr_id)])
+    except (FileNotFoundError, PermissionError, IOError) as e:
+        logger.warning(f"读取玩家绑定文件失败: {e}")
+        player_map = {}
+
     if at:
         payload = {"qq": usr_id, "b50": True}
     elif username == "":
@@ -404,18 +506,8 @@ async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
     elif success == 403:
         await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        await matcher.send(
-            Message(
-                [
-                    MessageSegment(
-                        "image",
-                        {
-                            "file": f"base64://{str(image_to_base64(img), encoding='utf-8')}",
-                        },
-                    ),
-                ],
-            ),
-        )
+        base64_img = image_to_base64(img)
+        await UniMessage.image(raw=base64_img).send()
 
 
 async def get_message_at(data: str) -> list:
@@ -435,13 +527,13 @@ async def get_message_at(data: str) -> list:
         return []
 
 
-def at_to_usrid(ats: List[str]):
+def at_to_usrid(ats: List[str], event: Event):
     """at对象变qqid否则返回usr_id"""
     if ats != []:
         at: str = ats[0]
         usr_id: str = at
         return usr_id
-    return None
+    return event.get_user_id()
 
 
 check_mai_data = on_command("检查mai资源", permission=SUPERUSER)
@@ -457,10 +549,10 @@ async def _(
     await matcher.send(await check_mai())
 
 
-@force_check_mai_data.handle()
-async def _(
-    matcher: Matcher,
-):
-    await matcher.send("正在尝试下载，大概需要2-3分钟")
-    logger.info("开始检查资源")
-    await matcher.send(await check_mai(force=True))
+# @force_check_mai_data.handle()
+# async def _(
+#     matcher: Matcher,
+# ):
+#     await matcher.send("正在尝试下载，大概需要2-3分钟")
+#     logger.info("开始检查资源")
+#     await matcher.send(await check_mai(force=True))
