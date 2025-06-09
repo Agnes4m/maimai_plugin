@@ -17,7 +17,7 @@ dependencies = [
 ]
 homepage = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
 repository = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 keywords = ["maimai", "nonebot2", "plugin"]
 classifiers = [
     "License :: OSI Approved :: MIT License",
