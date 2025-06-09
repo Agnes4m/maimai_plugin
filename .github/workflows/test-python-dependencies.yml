@@ -1,9 +1,9 @@
 name: Test-python-dependencies
 on:
   push:
-    branches: [ 1.x.x ]
+    branches: [ nonebot2.0.0 ]
   pull_request:
-    branches: [ 1.x.x ]
+    branches: [ nonebot2.0.0 ]
 jobs:
   test:
     runs-on: ubuntu-latest
