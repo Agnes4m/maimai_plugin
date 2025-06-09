@@ -22,11 +22,14 @@ _✨maimaiDX，nonebot2插件版本✨_
 </a>
     <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
     <img src="https://img.shields.io/badge/nonebot-2.0.0-red.svg" alt="NoneBot">
+<a href="https://github.com/nonebot/plugin-alconna">
+        <img src="https://img.shields.io/badge/%E9%80%82%E9%85%8D%E5%99%A8-nonebot_plugin_alconna-greg" alt="adpters">
+</a>    
 </div>
 
-## 说明（已更新图片素材）
+## 说明(2025年3月更新后未更新,暂时无法使用)
 
-从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.1.0
+从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.4.0
 
 修改部分：
 

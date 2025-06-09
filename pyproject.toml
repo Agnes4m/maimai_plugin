@@ -1,6 +1,6 @@
 [project]
 name = "nonebot_plugin_maimai"
-version = "0.5.0"
+dynamic = ["version"]
 description= "Maimai DX plugin for NoneBot"
 authors = [
     { name = "Agnes_Digital", email = "Z735803792@163.com" }
@@ -12,6 +12,7 @@ dependencies = [
     "pillow >10.0.0",
     "httpx >=0.22.0",
     "nonebot_plugin_alconna >=0.3.2",
+    "aiofiles >=24.1.0",
 ]
 homepage = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
 repository = "https://github.com/Agnes4m/maimai_plugin/tree/nonebot2.0.0"
@@ -40,6 +41,10 @@ includes = []
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm.version]
+source = "file"
+path = "nonebot_plugin_maimai/__init__.py"
 
 
 [tool.black]
