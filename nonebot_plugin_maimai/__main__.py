@@ -1,11 +1,28 @@
-import json
 import re
 from typing import Any
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 from nonebot import get_driver, on_command, on_regex, require
 from nonebot.adapters import Event, Message
 from nonebot.adapters import MessageSegment as BaseMessageSegment
 from nonebot.params import CommandArg, EventMessage
+from nonebot.permission import SUPERUSER
+from nonebot.plugin import PluginMetadata
+
+require("nonebot_plugin_alconna")
+from nonebot_plugin_alconna import UniMessage
+
+from .api import bind_site, show_all  # noqa: F401
+from .libraries.image import *
+from .libraries.maimai_best_40 import generate
+from .libraries.maimai_best_50 import generate50
+from .libraries.maimaidx_music import *
+from .libraries.tool import hash_
+from .public import *
 
 
 class MaiMessageSegment(BaseMessageSegment):
@@ -33,25 +50,6 @@ def MessageSegment(_type: str, data: dict) -> MaiMessageSegment:
     return MaiMessageSegment(_type, data)
 
 
-from nonebot.permission import SUPERUSER
-from nonebot.plugin import PluginMetadata
-
-require("nonebot_plugin_alconna")
-from nonebot_plugin_alconna import UniMessage
-
-from .api import bind_site, show_all  # noqa: F401
-from .libraries.image import *
-from .libraries.maimai_best_40 import generate
-from .libraries.maimai_best_50 import generate50
-from .libraries.maimaidx_music import *
-from .libraries.tool import hash_
-from .public import *
-
-try:
-    import ujson as json
-except ImportError:
-    import json
-
 driver = get_driver()
 try:
     nickname = next(iter(driver.config.nickname))
@@ -75,16 +73,14 @@ __plugin_meta__ = PluginMetadata(
 
 
 def song_txt(music: Music):
-    return UniMessage(
-        MessageSegment("text", {"text": f"{music.id}. {music.title}\n"}),
-        MessageSegment(
-            "image",
-            {
-                "file": f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png",
-            },
+    out = UniMessage.text(f"{music.id}. {music.title}\n")
+    out += (
+        UniMessage.image(
+            url=f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png",
         ),
-        MessageSegment("text", {"text": f"\n{'/'.join(music.level)}"}),  # type: ignore
     )
+    out += UniMessage.text(f"\n{'/'.join(music.level or [])}")
+    return out
 
 
 def inner_level_q(ds1, ds2=None):
@@ -322,7 +318,7 @@ async def _(event: Event):
     s += f"{nickname}提醒您：打机时不要大力拍打或滑动哦\n今日推荐歌曲："
     music = total_list[h % len(total_list)]
     send_msg = UniMessage.text(s)
-    send_msg.append(UniMessage.text(*song_txt(music)))
+    send_msg += song_txt(music)
 
     await UniMessage([str(MessageSegment("text", {"text": s})), *song_txt(music)]).send()
 
@@ -347,7 +343,7 @@ SLIDE\t3/7.5/15
 TOUCH\t1/2.5/5
 BREAK\t5/12.5/25(外加200落)"""
         img_image = text_to_image(s)
-        base64_img = image_to_base64(img_image)
+        base64_img = image_to_bytes(img_image)
         await UniMessage.image(raw=base64_img).send()
     elif len(argv) == 2:
         try:
@@ -462,7 +458,7 @@ async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
     elif success == 403:
         await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        base64_img = image_to_base64(img)
+        base64_img = image_to_bytes(img)
 
         await UniMessage.image(raw=base64_img).send()
 
@@ -494,18 +490,23 @@ async def _(event: Event, matcher: Matcher, message: Message = CommandArg()):
         player_map = {}
 
     if at:
-        payload = {"qq": usr_id, "b50": True}
+        payload = {"qq": usr_id, "b50": 1}
     elif username == "":
-        payload = {"qq": str(event.get_user_id()), "b50": True}
+        payload = {"qq": str(event.get_user_id()), "b50": 1}
     else:
-        payload = {"username": username, "b50": True}
-    img, success = await generate50(payload)
+        payload = {"username": username, "b50": 1}
+
+    logger.info(payload)
+    try:
+        img, success = await generate50(payload)
+    except FileNotFoundError:
+        await matcher.send("资源未下载，请超级管理员使用`检查mai资源`指令")
     if success == 400:
         await matcher.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
     elif success == 403:
         await matcher.send("该用户禁止了其他人获取数据。")
     else:
-        base64_img = image_to_base64(img)
+        base64_img = image_to_bytes(img)
         await UniMessage.image(raw=base64_img).send()
 
 
@@ -554,4 +555,6 @@ async def _(
 # ):
 #     await matcher.send("正在尝试下载，大概需要2-3分钟")
 #     logger.info("开始检查资源")
+#     await matcher.send(await check_mai(force=True))
+#     await matcher.send(await check_mai(force=True))
 #     await matcher.send(await check_mai(force=True))

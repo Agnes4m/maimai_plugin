@@ -6,7 +6,7 @@ on:
     branches: [ nonebot2.0.0 ]
 jobs:
   test:
-    if: github.repository == 'https://github.com/Agnes4m/maimai_plugin'
+    if: github.repository == 'Agnes4m/maimai_plugin'
     runs-on: ubuntu-latest
     strategy:
       matrix:

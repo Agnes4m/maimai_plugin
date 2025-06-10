@@ -27,16 +27,15 @@ _✨maimaiDX，nonebot2插件版本✨_
 </a>    
 </div>
 
-## 说明(2025年3月更新后未更新,暂时无法使用)
+## 说明(2025年6月10日以更新可以正常使用)
 
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配nonebot2插件，测试环境nonebot2.4.0
 
-修改部分：
-
+- `mai帮助`获取帮助指令
 - b40/b50可以艾特人查询
-- static文件可以放maimai插件文件夹中，或机器人路径下/data/maimai/static
-- （可循）env设置 `maimai_font`,是str对象的`字体`
-- 新增指令检查mai资源可以初始化下载，或者强制检查mai资源强制下载覆盖
+- `检查mai资源`超级管理员指令，自动下载图片资源
+- 用pil画图轻量
+- 支持nonebot_plugin_alconna跨平台适配
 
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
@@ -52,7 +51,8 @@ _✨maimaiDX，nonebot2插件版本✨_
     nb plugin install nonebot_plugin_maimai
     git clone https://github.com/Agnes4m/nonebot_plugin_maimai.git
 
-您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:(以下方法2选1)
+~~您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:(以下方法2选1)~~
+只需要超级管理员输入指令`检查mai资源`即可
 
 - pypi`nonebot_plugin_maimai`文件夹中 - 最终路径类似是/path/to/nonebot_plugin_maimai/static
 - 机器人目录下 - 最终路径类似是/path/to/data/maimai/static中。其中bot.py文件在/path/to位置
@@ -73,7 +73,7 @@ _✨maimaiDX，nonebot2插件版本✨_
 
 命令 | 功能
 --- | ---
-help | 查看帮助文档
+mai帮助 | 查看帮助文档
 今日舞萌 | 查看今天的舞萌运势
 XXXmaimaiXXX什么 | 随机一首歌
 随个[dx/标准][绿黄红紫白]<难度> | 随机一首指定条件的乐曲
@@ -85,7 +85,7 @@ XXXmaimaiXXX什么 | 随机一首歌
 
 ## 原作者
 
-[Diving-Fish](https://github.com/Diving-Fish),感谢大佬为音游人的无私奉献
+[Diving-Fish](https://github.com/Diving-Fish)
 
 ## License
 

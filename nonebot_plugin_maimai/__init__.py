@@ -8,7 +8,7 @@ from . import __main__ as __main__  # noqa: E402
 
 driver = get_driver()
 
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 __plugin_meta__ = PluginMetadata(
     name="舞萌DX成绩查询",
     description="水鱼自建服务器的改适配版本",

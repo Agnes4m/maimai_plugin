@@ -1,4 +1,3 @@
-import base64
 from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
@@ -49,8 +48,10 @@ def text_to_image(text):
     return i
 
 
-def image_to_base64(img, format="PNG"):  # noqa: A002
+def image_to_bytes(img, img_format="PNG"):
+    """
+    将 PIL Image 对象转换为 bytes 对象
+    """
     output_buffer = BytesIO()
-    img.save(output_buffer, format)
-    byte_data = output_buffer.getvalue()
-    return base64.b64encode(byte_data)
+    img.save(output_buffer, format=img_format)
+    return output_buffer.getvalue()

@@ -71,7 +71,7 @@ async def check_mai(force: bool = False):  # noqa: FBT001
                 zip_file.extractall(Path("data/maimai"))
             logger.success("mai资源已完整，尝试删除缓存")
             Path("static.zip").unlink()  # 删除下载的压缩文件
-            msg = "mai资源下载成功，请使用【舞萌帮助】获取指令"
+            msg = "mai资源下载成功，请使用【mai帮助】获取指令"
 
         except Exception as e:
             logger.warning(f"自动下载出错\n{e}\n请自行尝试手动下载")
