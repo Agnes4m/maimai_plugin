@@ -1,31 +1,31 @@
-import asyncio
-import json
 import re
+import json
+import asyncio
 from typing import Any, Dict, List, Optional
 
 import aiohttp
-from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
-from gsuid_core.models import Event
-from gsuid_core.models import Message as Messages
-from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
+from gsuid_core.bot import Bot
+from gsuid_core.models import Event
+from gsuid_core.logger import logger
+from gsuid_core.segment import MessageSegment
+from gsuid_core.models import Message as Messages
 
 from .public import *
 
 try:
     from .libraries.image import (
-        image_to_base64,
+        url_to_bytes,
         text_to_image,
         url_to_base64,
-        url_to_bytes,
+        image_to_base64,
     )
 except Exception as E:
     logger.warning(E)
+from .libraries.tool import _hash, check_mai
 from .libraries.maimai_best_40 import generate
 from .libraries.maimai_best_50 import generate50
-from .libraries.maimaidx_music import Music, get_cover_len5_id, total_list
-from .libraries.tool import _hash, check_mai
+from .libraries.maimaidx_music import Music, total_list, get_cover_len5_id
 
 sv = SV(
     name="基础指令",  # 定义一组服务`开关`,
@@ -321,8 +321,12 @@ BREAK\t5/12.5/25(外加200落)"""
 
 @sv.on_command("b40")
 async def best_40_pic(bot: Bot, event: Event):
-    payload = at_to_usrid(event, "b40")
-    img, success = await generate(payload)
+    payload = at_to_usrid(event, 0)
+    try:
+        img, success = await generate(payload)
+    except FileNotFoundError:
+        await bot.send("请先下载舞萌资源，输入“检查mai资源”")
+        return
     if success == 400 or not img:
         await bot.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
     elif success == 403:
@@ -339,7 +343,11 @@ async def best_40_pic(bot: Bot, event: Event):
 @sv.on_command("b50")
 async def best_50_pic(bot: Bot, event: Event):
     payload = at_to_usrid(event)
-    img, success = await generate50(payload)
+    try:
+        img, success = await generate50(payload)
+    except FileNotFoundError:
+        await bot.send("请先下载舞萌资源，输入“检查mai资源”")
+        return
     if success == 400 or not img:
         await bot.send("未找到此玩家，请确保此玩家的用户名和查分器中的用户名相同。")
     elif success == 403:
@@ -353,14 +361,14 @@ async def best_50_pic(bot: Bot, event: Event):
         )
 
 
-def at_to_usrid(event: Event, b: str = "b50"):
+def at_to_usrid(event: Event, b50: int = 1):
     """存在at优先，其次co_command,最后usr_id"""
     if event.at:
-        return {"qq": event.at, b: True}
+        return {"qq": event.at, "b50": b50}
     elif event.text:
-        return {"username": event.text, b: True}
+        return {"username": event.text, "b50": b50}
     else:
-        return {"qq": event.user_id, b: True}
+        return {"qq": event.user_id, "b50": b50}
 
 
 @sv.on_command(("help", "舞萌帮助", "mai帮助"), block=True)
@@ -395,4 +403,5 @@ async def check_mai_data(bot: Bot, event: Event):
 async def force_check_mai_data(bot: Bot, event: Event):
     await bot.send("正在尝试下载，大概需要2-3分钟")
     logger.info("开始检查资源")
+    await bot.send(await check_mai(force=True))
     await bot.send(await check_mai(force=True))

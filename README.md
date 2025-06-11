@@ -19,7 +19,14 @@ _✨maimaiDX，gsuid_core插件版本✨_
     <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
 </div>
 
-## 说明（已更新舞萌国服2023，重新下载资源）
+
+## 省流使用指令
+
+- b50  查询个人b50
+- b40  查询个人b40
+- 今日舞萌  查询今日舞萌运势
+
+## 说明（已更新舞萌国服2025.5）
 
 从[mai-bot](https://github.com/Diving-Fish/mai-bot)适配[gsuid_core](http://docs.gsuid.gbots.work)
 
@@ -30,19 +37,18 @@ _✨maimaiDX，gsuid_core插件版本✨_
 我做的适配有问题请冲我来不要打扰原作者捏，可以提iss或者[加群qq](https://jq.qq.com/?_wv=1027&k=l82tMuPG)反馈,
 
 
-## 前置步骤（和原项目一样）
+## 前置步骤
 
 参考[早柚核心文档](http://docs.gsuid.gbots.work)选择适配器
 
-安装（仍选其一）:
+安装按照上述文档指令安装/web安装，或者手动到`plugins`目录下clone:
 
     git clone -b gsuid_core https://ghproxy.com/https://github.com/Agnes4m/maimai_plugin.git
 
-您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到:
 
- - `data/maimai_plugin`
+~~您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并，并将其static文件解压到`data/maimai_plugin`~~
 
-或者使用指令`检查mai资源`
+使用指令`检查mai资源`
 
 > 资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
 
@@ -52,7 +58,6 @@ _✨maimaiDX，gsuid_core插件版本✨_
 
 命令 | 功能
 --- | ---
-help | 查看帮助文档
 今日舞萌 | 查看今天的舞萌运势
 XXXmaimaiXXX什么 | 随机一首歌
 随个[dx/标准][绿黄红紫白]<难度> | 随机一首指定条件的乐曲
@@ -63,7 +68,7 @@ XXXmaimaiXXX什么 | 随机一首歌
 
 ## 原作者
 
-[Diving-Fish](https://github.com/Diving-Fish),感谢大佬为音游人的无私奉献
+[Diving-Fish](https://github.com/Diving-Fish)
 
 ## License
 
